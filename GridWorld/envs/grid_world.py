@@ -19,13 +19,14 @@ class GridWorldEnv(gym.Env):
         self.size = size  # The size of the square grid
         self.window_size = 512  # The size of the PyGame window
 
-        # Observations are dictionaries with the agent's and the target's location.
-        # Each location is encoded as an element of {0, ..., `size`}^2,
-        # i.e. MultiDiscrete([size, size]).
+        # Observations are the information the agent receives from the environment
         self.observation_space = spaces.Dict(
             {
                 "agent": spaces.Box(0, size - 1, shape=(2,), dtype=int),
                 "target": spaces.Box(0, size - 1, shape=(2,), dtype=int),
+                "<special_1>": spaces.Box(0, size - 1, shape=(2,), dtype=int),
+                "<special_2>": spaces.Box(0, size - 1, shape=(2,), dtype=int),
+                "<special_3>": spaces.Box(0, size - 1, shape=(2,), dtype=int),
             }
         )
 
@@ -58,7 +59,13 @@ class GridWorldEnv(gym.Env):
         self.clock = None
 
     def _get_obs(self):
-        return {"agent": self._agent_location, "target": self._target_location}
+        return {
+            "agent": self._agent_location,
+            "target": self._target_location,
+            "<special_1>": self._special_1_location,
+            "<special_2>": self._special_2_location,
+            "<special_3>": self._special_3_location,
+        }
 
     def _get_info(self):
         return {
@@ -76,8 +83,20 @@ class GridWorldEnv(gym.Env):
 
         # We will sample the target's location randomly until it does not
         # coincide with the agent's location
-        self._target_location = self._agent_location
+        self._target_location, self._special_1_location, self._special_2_location, self._special_3_location = self._agent_location
         while np.array_equal(self._target_location, self._agent_location):
+            self._target_location = self.np_random.integers(
+                0, self.size, size=2, dtype=int
+            )
+        while any(np.array_equal(self._special_1_location, a) for a in [self._target_location, self._agent_location]):
+            self._target_location = self.np_random.integers(
+                0, self.size, size=2, dtype=int
+            )
+        while any(np.array_equal(self._special_2_location, a) for a in [self._special_1_location, self._target_location, self._agent_location]):
+            self._target_location = self.np_random.integers(
+                0, self.size, size=2, dtype=int
+            )
+        while any(np.array_equal(self._special_3_location, a) for a in [self._special_2_location, self._special_1_location, self._target_location, self._agent_location]):
             self._target_location = self.np_random.integers(
                 0, self.size, size=2, dtype=int
             )
