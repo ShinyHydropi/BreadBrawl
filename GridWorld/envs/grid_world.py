@@ -88,15 +88,18 @@ class GridWorldEnv(gym.Env):
             self._target_location = self.np_random.integers(
                 0, self.size, size=2, dtype=int
             )
-        while any(np.array_equal(self._special_1_location, a) for a in [self._target_location, self._agent_location]):
+        while any(np.array_equal(self._special_1_location, a) for a in
+                  [self._target_location, self._agent_location]):
             self._target_location = self.np_random.integers(
                 0, self.size, size=2, dtype=int
             )
-        while any(np.array_equal(self._special_2_location, a) for a in [self._special_1_location, self._target_location, self._agent_location]):
+        while any(np.array_equal(self._special_2_location, a) for a in
+                  [self._special_1_location, self._target_location, self._agent_location]):
             self._target_location = self.np_random.integers(
                 0, self.size, size=2, dtype=int
             )
-        while any(np.array_equal(self._special_3_location, a) for a in [self._special_2_location, self._special_1_location, self._target_location, self._agent_location]):
+        while any(np.array_equal(self._special_3_location, a) for a in
+                  [self._special_2_location, self._special_1_location, self._target_location, self._agent_location]):
             self._target_location = self.np_random.integers(
                 0, self.size, size=2, dtype=int
             )
@@ -116,9 +119,17 @@ class GridWorldEnv(gym.Env):
         self._agent_location = np.clip(
             self._agent_location + direction, 0, self.size - 1
         )
-        # An episode is done iff the agent has reached the target
+
+        # Modify this line if your tile affects termination of the episode
         terminated = np.array_equal(self._agent_location, self._target_location)
-        reward = 1 if terminated else 0  # Binary sparse rewards
+
+
+        reward = 1 if terminated else 0  # Modify this line if your tile affects the agent's reward
+
+
+        # Add any other affects of your tile here
+
+
         observation = self._get_obs()
         info = self._get_info()
 
@@ -142,7 +153,7 @@ class GridWorldEnv(gym.Env):
         canvas = pygame.Surface((self.window_size, self.window_size))
         canvas.fill((255, 255, 255))
         pix_square_size = (
-            self.window_size / self.size
+                self.window_size / self.size
         )  # The size of a single grid square in pixels
 
         # First we draw the target
@@ -154,6 +165,35 @@ class GridWorldEnv(gym.Env):
                 (pix_square_size, pix_square_size),
             ),
         )
+
+        # Your tiles (list of colors at https://www.pygame.org/docs/ref/color_list.html or use RGB tuple):
+        pygame.draw.rect(
+            canvas,
+            "darkgreen",
+            pygame.Rect(
+                pix_square_size * self._special_1_location,
+                (pix_square_size, pix_square_size),
+            ),
+        )
+
+        pygame.draw.rect(
+            canvas,
+            "powderblue",
+            pygame.Rect(
+                pix_square_size * self._special_2_location,
+                (pix_square_size, pix_square_size),
+            ),
+        )
+
+        pygame.draw.rect(
+            canvas,
+            "magenta",
+            pygame.Rect(
+                pix_square_size * self._special_3_location,
+                (pix_square_size, pix_square_size),
+            ),
+        )
+
         # Now we draw the agent
         pygame.draw.circle(
             canvas,
