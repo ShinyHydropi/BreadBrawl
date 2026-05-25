@@ -60,12 +60,14 @@ class BreadBrawl:
         self.terminated = True
 
     # Constructor for training an agent
-    def training_env(self, p1: Loaf):
-        return self.__init__(p1, Loaf(2, 2, 2, random.sample(list(Attack), 4)))
+    @classmethod
+    def training_env(cls, p1: Loaf):
+        return cls(p1, Loaf(2, 2, 2, random.sample(list(Attack), 4)))
 
     # Constructor for battling agents
-    def duel_env(self, p1: Loaf, p2: Loaf):
-        return self.__init__(p1, p2)
+    @classmethod
+    def duel_env(cls, p1: Loaf, p2: Loaf):
+        return cls(p1, p2)
 
     # Method for handling the effects of attacks
     def _perform_attack(self, attack: Attack, user: Player):
