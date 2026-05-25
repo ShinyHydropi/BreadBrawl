@@ -105,6 +105,9 @@ class BreadBrawl:
 
     # Method for stepping the environment by performing the attacks selected by each agent
     def step_2p(self, p1att: Attack, p2att: Attack):
+        i_hp_1 = self.states[Player.p1].hp
+        i_hp_2 = self.states[Player.p2].hp
+
         if p2att is None:
             p2att = random.sample(list(self.players[Player.p2].attacks), 1)
         elif not (p2att in self.players[Player.p2]):
@@ -151,4 +154,5 @@ class BreadBrawl:
         if self.states[Player.p1].hp == 0 or self.states[Player.p2].hp == 0:
             self.terminated = True
 
-        return self.states, self.terminated
+        # Returns the current state, a termination conditional, and the net change in hp after the turn
+        return self.states, self.terminated, self.states[Player.p1].hp - i_hp_1 + i_hp_2 - self.states[Player.p2]
