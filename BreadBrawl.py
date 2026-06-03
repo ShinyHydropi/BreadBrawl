@@ -41,8 +41,8 @@ class Loaf:
     def __init__(self, flour: int, salt: int, sugar: int, attacks: set[Attack]):
         if not (0 <= flour + salt + sugar <= 6):
             raise ValueError("Extra points added to your stat spread must be between 0 and 6")
-        if len(attacks) > 4:
-            raise ValueError("Your Loaf can have no more than 4 attacks")
+        if len(attacks) > 4 or len(attacks) == 0:
+            raise ValueError("Your Loaf must have 1-4 attacks")
         self.flour = 25 + flour
         self.salt = 10 + salt
         self.sugar = 10 + sugar
@@ -50,6 +50,9 @@ class Loaf:
 
     def __cmp__(self, other):
         return self.sugar - other.sugar
+
+    def random_attack(self):
+        return random.sample(list(self.attacks), 1)[0]
 
 class BreadBrawl:
     def __init__(self, p1: Loaf, p2: Loaf):
@@ -101,16 +104,16 @@ class BreadBrawl:
         self.terminated = False
         return self.states
 
-    #def step_1p(self):
+    # Method for stepping a training environment (adversarial policies still needed)
+    def step_1p(self, p1att: Attack):
+        return self.step_2p(p1att, self.players[Player.p2].random_attack())
 
     # Method for stepping the environment by performing the attacks selected by each agent
     def step_2p(self, p1att: Attack, p2att: Attack):
         i_hp_1 = self.states[Player.p1].hp
         i_hp_2 = self.states[Player.p2].hp
 
-        if p2att is None:
-            p2att = random.sample(list(self.players[Player.p2].attacks), 1)
-        elif not (p2att in self.players[Player.p2]):
+        if not (p2att in self.players[Player.p2]):
             raise ValueError("p2att not in player")
         if not (p1att in self.players[Player.p1]):
             raise ValueError("p1att not in player")
