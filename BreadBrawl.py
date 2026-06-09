@@ -48,6 +48,16 @@ class Loaf:
         self.sugar = 10 + sugar
         self.attacks = attacks
 
+    # method to generate a random Loaf
+    @classmethod
+    def random_loaf(cls):
+        # Method for generating a 3-tuple summing to 6 source: https://share.google/aimode/oDOuCVbR3pZ80r6Oc
+        cuts = random.choices(range(0, 7), k=2)
+        points: list[int] = sorted([0] + cuts + [6])
+        flour, salt, sugar = (points[i+1] - points[i] for i in range(3))
+
+        return cls(flour,salt,sugar,random.sample(Attack, 4))
+
     def __cmp__(self, other):
         return self.sugar - other.sugar
 
