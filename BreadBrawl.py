@@ -52,7 +52,10 @@ class Loaf:
         return self.sugar - other.sugar
 
     def random_attack(self):
-        return random.sample(list(self.attacks), 1)[0]
+        return random.sample(self.action_space(), 1)[0]
+
+    def action_space(self):
+        return list(self.attacks)
 
 class BreadBrawl:
     def __init__(self, p1: Loaf, p2: Loaf):
