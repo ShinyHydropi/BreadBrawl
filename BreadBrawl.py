@@ -67,6 +67,9 @@ class Loaf:
     def action_space(self):
         return list(self.attacks)
 
+    def __str__(self):
+        return f"Loaf(Flour: {self.flour}, Salt: {self.salt}, Sugar: {self.sugar}, Attacks: {self.attacks})"
+
 class BreadBrawl:
     def __init__(self, p1: Loaf, p2: Loaf):
         self.states = None
