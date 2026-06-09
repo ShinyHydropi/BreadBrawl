@@ -33,6 +33,10 @@ class PlayerState:
     sprint: int
     power_up: int
 
+    # Method to convert to tuples for observation from an agent
+    def to_tuple(self):
+        return self.hp, self.blocked, self.sprint, self.power_up
+
 # Loaf class for creating bread loaves to battle with
 # flour is your hp, salt is your attack, and sugar is your speed
 # Your base stat spread is 25/10/10, and you can distribute 6 extra points among them
@@ -74,7 +78,7 @@ class BreadBrawl:
     def __init__(self, p1: Loaf, p2: Loaf):
         self.states = None
         if p2 is None:
-            p2 = Loaf(2, 2, 2, random.sample(list(Attack), 4))
+            p2 = Loaf.random_loaf()
         self.players = {Player.p1: p1, Player.p2: p2}
         self.terminated = True
 
@@ -87,6 +91,11 @@ class BreadBrawl:
     @classmethod
     def duel_env(cls, p1: Loaf, p2: Loaf):
         return cls(p1, p2)
+
+    # Method to return the state space shape
+    @staticmethod
+    def state_space_shape() -> tuple[int, ...]:
+        return 32, 2, 4, 4, 32, 2, 4, 4
 
     # Method for handling the effects of attacks
     def _perform_attack(self, attack: Attack, user: Player):
@@ -174,4 +183,4 @@ class BreadBrawl:
             self.terminated = True
 
         # Returns the current state, a termination conditional, and the net change in hp after the turn
-        return self.states, self.terminated, self.states[Player.p1].hp - i_hp_1 + i_hp_2 - self.states[Player.p2]
+        return self.states[Player.p1].to_tuple() + self.states[Player.p2].to_tuple(), self.terminated, self.states[Player.p1].hp - i_hp_1 + i_hp_2 - self.states[Player.p2]
