@@ -141,21 +141,24 @@ def main():
             if st.session_state.turn_active:
                 # Display attack sequence animation
                 st.subheader("⚔️ Battle Animation")
-                animation_container = st.container()
+                animation_placeholder = st.empty()
                 
-                # Show all attacks with delays
+                # Show all attacks with 2-second display and wait for disappearance
                 for player, attack in st.session_state.attack_sequence:
-                    with animation_container:
-                        player_num = player.value + 1
-                        emoji = get_attack_emoji(attack)
-                        desc = get_attack_description(attack)
-                        
-                        if player_num == 1:
+                    player_num = player.value + 1
+                    emoji = get_attack_emoji(attack)
+                    desc = get_attack_description(attack)
+                    
+                    if player_num == 1:
+                        with animation_placeholder.container():
                             st.info(f"🔵 Player {player_num}: {emoji} {desc}")
-                        else:
+                    else:
+                        with animation_placeholder.container():
                             st.warning(f"🔴 Player {player_num}: {emoji} {desc}")
-                        
-                        time.sleep(1)
+                    
+                    time.sleep(2)
+                    animation_placeholder.empty()
+                    time.sleep(0.3)
                 
                 # After animation, show updated stats
                 st.markdown("---")
