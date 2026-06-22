@@ -132,7 +132,7 @@ class BreadBrawl:
     def step_2p(self, p1att: Attack, p2att: Attack):
         i_hp_1 = self.states[Player.p1].hp
         i_hp_2 = self.states[Player.p2].hp
-        order = [Player.p1]
+        move_sequence = []
 
         if not (p2att in self.players[Player.p2].attacks):
             raise ValueError("p2att not in player")
@@ -144,35 +144,41 @@ class BreadBrawl:
 
         if p1att == Attack.block: # Performs any blocks before other attacks
             self._perform_attack(p1att, Player.p1)
-            order.append(Player.p2)
+            move_sequence.append((Player.p1, p1att))
 
         if p2att == Attack.block:
             self._perform_attack(p2att, Player.p2)
+            move_sequence.append((Player.p2, p2att))
 
         # Handles remaining sequence of attacks
         if self.states[Player.p1].blocked == 0 and self.states[Player.p2].blocked == 0:
             if self.players[Player.p1].sugar * (2 if self.states[Player.p1].sprint else 1) > self.players[Player.p2].flour * (2 if self.states[Player.p1].sprint else 1):
                 self._perform_attack(p1att, Player.p1)
+                move_sequence.append((Player.p1, p1att))
                 self._perform_attack(p2att, Player.p2)
-                order.append(Player.p2)
+                move_sequence.append((Player.p2, p2att))
             elif self.players[Player.p1].sugar * (2 if self.states[Player.p1].sprint else 1) < self.players[Player.p2].flour * (2 if self.states[Player.p1].sprint else 1):
                 self._perform_attack(p2att, Player.p2)
+                move_sequence.append((Player.p2, p2att))
                 self._perform_attack(p1att, Player.p1)
-                order.insert(0, Player.p2)
+                move_sequence.append((Player.p1, p1att))
             else:
                 if random.randint(0, 1):
                     self._perform_attack(p1att, Player.p1)
+                    move_sequence.append((Player.p1, p1att))
                     self._perform_attack(p2att, Player.p2)
-                    order.append(Player.p2)
+                    move_sequence.append((Player.p2, p2att))
                 else:
                     self._perform_attack(p2att, Player.p2)
+                    move_sequence.append((Player.p2, p2att))
                     self._perform_attack(p1att, Player.p1)
-                    order.insert(0, Player.p2)
+                    move_sequence.append((Player.p1, p1att))
         elif self.states[Player.p1].blocked == 0:
             self._perform_attack(p1att, Player.p1)
-            order.insert(0, Player.p2)
+            move_sequence.append((Player.p1, p1att))
         elif self.states[Player.p2].blocked == 0:
             self._perform_attack(p2att, Player.p2)
+            move_sequence.append((Player.p2, p2att))
 
         # Decrements the sprint and power_up turn counters for both players
         self.states[Player.p1].sprint = max(0, self.states[Player.p1].sprint - 1)
@@ -185,4 +191,4 @@ class BreadBrawl:
             self.terminated = True
 
         # Returns the current state, a termination conditional, and the net change in hp after the turn
-        return self.states[Player.p1].to_tuple() + self.states[Player.p2].to_tuple(), order, self.terminated, self.states[Player.p1].hp - i_hp_1 + i_hp_2 - self.states[Player.p2].hp
+        return self.states[Player.p1].to_tuple() + self.states[Player.p2].to_tuple(), move_sequence, self.terminated, self.states[Player.p1].hp - i_hp_1 + i_hp_2 - self.states[Player.p2].hp
