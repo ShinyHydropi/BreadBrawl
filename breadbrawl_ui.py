@@ -144,10 +144,9 @@ def main():
                 animation_container = st.container()
                 
                 # Show all attacks with delays
-                for attack_info in st.session_state.attack_sequence:
+                for player, attack in st.session_state.attack_sequence:
                     with animation_container:
-                        player_num = attack_info["player"].value + 1
-                        attack = attack_info["attack"]
+                        player_num = player.value + 1
                         emoji = get_attack_emoji(attack)
                         desc = get_attack_description(attack)
                         
@@ -188,20 +187,11 @@ def main():
                     # Player 2 makes random choice
                     p2_choice = p2_loaf.random_attack()
                     
-                    # Execute turn - assuming step_2p now returns (state_tuple, attack_order, terminated, reward)
-                    # where attack_order is a list of (Player, Attack) tuples in resolution order
-                    result = game.step_2p(p1_choice, p2_choice)
+                    # Execute turn
+                    state_tuple, move_sequence, terminated, reward = game.step_2p(p1_choice, p2_choice)
                     
-                    # Handle the new return format with attack sequence
-                    if len(result) == 4:
-                        state_tuple, attack_order, terminated, reward = result
-                    else:
-                        # Fallback for old format
-                        state_tuple, terminated, reward = result
-                        attack_order = []
-                    
-                    # Build attack sequence for animation
-                    st.session_state.attack_sequence = attack_order
+                    # move_sequence is a list of (Player, Attack) tuples in resolution order
+                    st.session_state.attack_sequence = move_sequence
                     st.session_state.turn_active = True
                     
                     st.rerun()
