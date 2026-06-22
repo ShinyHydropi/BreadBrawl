@@ -1,4 +1,5 @@
 import streamlit as st
+import time
 from BreadBrawl import BreadBrawl, Loaf, Attack, Player
 
 # Page configuration
@@ -11,6 +12,9 @@ if "game" not in st.session_state:
     st.session_state.p1_loaf = None
     st.session_state.p2_loaf = None
     st.session_state.game_started = False
+    st.session_state.turn_active = False
+    st.session_state.attack_sequence = []
+    st.session_state.attack_index = 0
 
 def init_game():
     """Initialize a new game with random loaves."""
@@ -19,6 +23,9 @@ def init_game():
     st.session_state.game = BreadBrawl(st.session_state.p1_loaf, st.session_state.p2_loaf)
     st.session_state.game.reset()
     st.session_state.game_started = True
+    st.session_state.turn_active = False
+    st.session_state.attack_sequence = []
+    st.session_state.attack_index = 0
 
 def get_attack_emoji(attack: Attack) -> str:
     """Get emoji representation for attack types."""
@@ -35,12 +42,12 @@ def get_attack_emoji(attack: Attack) -> str:
 def get_attack_description(attack: Attack) -> str:
     """Get description for attack types."""
     descriptions = {
-        Attack.block: "Block - Protect yourself from damage",
-        Attack.slash: "Slash - Deal damage",
-        Attack.drain: "Drain - Deal damage and heal",
-        Attack.heal: "Heal - Restore health",
-        Attack.sprint: "Sprint - Double speed for 3 turns",
-        Attack.power_up: "Power-Up - Double attack for 3 turns",
+        Attack.block: "Block",
+        Attack.slash: "Slash",
+        Attack.drain: "Drain",
+        Attack.heal: "Heal",
+        Attack.sprint: "Sprint",
+        Attack.power_up: "Power-Up",
     }
     return descriptions.get(attack, attack.name)
 
@@ -131,44 +138,73 @@ def main():
             
             st.markdown("---")
             
-            # Player 1 move selection
-            st.subheader("⚔️ Choose Your Move (Player 1)")
-            
-            p1_attacks = p1_loaf.action_space()
-            attack_buttons = st.columns(len(p1_attacks))
-            
-            p1_choice = None
-            for i, (button_col, attack) in enumerate(zip(attack_buttons, p1_attacks)):
-                with button_col:
-                    emoji = get_attack_emoji(attack)
-                    desc = get_attack_description(attack)
-                    if st.button(f"{emoji}\n{desc}", key=f"attack_{attack.name}", use_container_width=True):
-                        p1_choice = attack
-            
-            if p1_choice:
-                # Player 2 makes random choice
-                p2_choice = p2_loaf.random_attack()
+            if st.session_state.turn_active:
+                # Display attack sequence animation
+                st.subheader("⚔️ Battle Animation")
+                animation_container = st.container()
                 
-                # Execute turn
-                state_tuple, terminated, reward = game.step_2p(p1_choice, p2_choice)
+                # Show all attacks with delays
+                for attack_info in st.session_state.attack_sequence:
+                    with animation_container:
+                        player_num = attack_info["player"].value + 1
+                        attack = attack_info["attack"]
+                        emoji = get_attack_emoji(attack)
+                        desc = get_attack_description(attack)
+                        
+                        if player_num == 1:
+                            st.info(f"🔵 Player {player_num}: {emoji} {desc}")
+                        else:
+                            st.warning(f"🔴 Player {player_num}: {emoji} {desc}")
+                        
+                        time.sleep(1)
                 
-                # Show what happened
-                col1, col2 = st.columns(2)
-                with col1:
-                    st.info(f"You chose: {get_attack_emoji(p1_choice)} {get_attack_description(p1_choice)}")
-                with col2:
-                    st.warning(f"Opponent chose: {get_attack_emoji(p2_choice)} {get_attack_description(p2_choice)}")
-                
+                # After animation, show updated stats
                 st.markdown("---")
-                
-                # Show updated stats
-                st.subheader("📊 Battle Status")
+                st.subheader("📊 Updated Battle Status")
                 col1, col2 = st.columns(2)
                 
                 display_loaf(Player.p1, p1_loaf, game.states[Player.p1], col1)
                 display_loaf(Player.p2, p2_loaf, game.states[Player.p2], col2)
                 
+                st.session_state.turn_active = False
+                st.session_state.attack_sequence = []
                 st.rerun()
+            else:
+                # Player 1 move selection
+                st.subheader("⚔️ Choose Your Move (Player 1)")
+                
+                p1_attacks = p1_loaf.action_space()
+                attack_buttons = st.columns(len(p1_attacks))
+                
+                p1_choice = None
+                for i, (button_col, attack) in enumerate(zip(attack_buttons, p1_attacks)):
+                    with button_col:
+                        emoji = get_attack_emoji(attack)
+                        desc = get_attack_description(attack)
+                        if st.button(f"{emoji}\n{desc}", key=f"attack_{attack.name}", use_container_width=True):
+                            p1_choice = attack
+                
+                if p1_choice:
+                    # Player 2 makes random choice
+                    p2_choice = p2_loaf.random_attack()
+                    
+                    # Execute turn - assuming step_2p now returns (state_tuple, attack_order, terminated, reward)
+                    # where attack_order is a list of (Player, Attack) tuples in resolution order
+                    result = game.step_2p(p1_choice, p2_choice)
+                    
+                    # Handle the new return format with attack sequence
+                    if len(result) == 4:
+                        state_tuple, attack_order, terminated, reward = result
+                    else:
+                        # Fallback for old format
+                        state_tuple, terminated, reward = result
+                        attack_order = []
+                    
+                    # Build attack sequence for animation
+                    st.session_state.attack_sequence = attack_order
+                    st.session_state.turn_active = True
+                    
+                    st.rerun()
 
 if __name__ == "__main__":
     main()
