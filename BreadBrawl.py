@@ -60,7 +60,7 @@ class Loaf:
         points: list[int] = sorted([0] + cuts + [6])
         flour, salt, sugar = (points[i+1] - points[i] for i in range(3))
 
-        return cls(flour,salt,sugar,random.sample(Attack, 4))
+        return cls(flour,salt,sugar,random.sample(list(Attack), 4))
 
     def __cmp__(self, other):
         return self.sugar - other.sugar
@@ -132,10 +132,11 @@ class BreadBrawl:
     def step_2p(self, p1att: Attack, p2att: Attack):
         i_hp_1 = self.states[Player.p1].hp
         i_hp_2 = self.states[Player.p2].hp
+        order = [Player.p1]
 
-        if not (p2att in self.players[Player.p2]):
+        if not (p2att in self.players[Player.p2].attacks):
             raise ValueError("p2att not in player")
-        if not (p1att in self.players[Player.p1]):
+        if not (p1att in self.players[Player.p1].attacks):
             raise ValueError("p1att not in player")
 
         self.states[Player.p1].blocked = 0 # Decrements blocked to begin the turn (since blocked indicates a block last turn and handles the effect of blocking)
@@ -143,6 +144,7 @@ class BreadBrawl:
 
         if p1att == Attack.block: # Performs any blocks before other attacks
             self._perform_attack(p1att, Player.p1)
+            order.append(Player.p2)
 
         if p2att == Attack.block:
             self._perform_attack(p2att, Player.p2)
@@ -152,18 +154,23 @@ class BreadBrawl:
             if self.players[Player.p1].sugar * (2 if self.states[Player.p1].sprint else 1) > self.players[Player.p2].flour * (2 if self.states[Player.p1].sprint else 1):
                 self._perform_attack(p1att, Player.p1)
                 self._perform_attack(p2att, Player.p2)
+                order.append(Player.p2)
             elif self.players[Player.p1].sugar * (2 if self.states[Player.p1].sprint else 1) < self.players[Player.p2].flour * (2 if self.states[Player.p1].sprint else 1):
                 self._perform_attack(p2att, Player.p2)
                 self._perform_attack(p1att, Player.p1)
+                order.insert(0, Player.p2)
             else:
                 if random.randint(0, 1):
                     self._perform_attack(p1att, Player.p1)
                     self._perform_attack(p2att, Player.p2)
+                    order.append(Player.p2)
                 else:
                     self._perform_attack(p2att, Player.p2)
                     self._perform_attack(p1att, Player.p1)
+                    order.insert(0, Player.p2)
         elif self.states[Player.p1].blocked == 0:
             self._perform_attack(p1att, Player.p1)
+            order.insert(0, Player.p2)
         elif self.states[Player.p2].blocked == 0:
             self._perform_attack(p2att, Player.p2)
 
@@ -178,4 +185,4 @@ class BreadBrawl:
             self.terminated = True
 
         # Returns the current state, a termination conditional, and the net change in hp after the turn
-        return self.states[Player.p1].to_tuple() + self.states[Player.p2].to_tuple(), self.terminated, self.states[Player.p1].hp - i_hp_1 + i_hp_2 - self.states[Player.p2]
+        return self.states[Player.p1].to_tuple() + self.states[Player.p2].to_tuple(), order, self.terminated, self.states[Player.p1].hp - i_hp_1 + i_hp_2 - self.states[Player.p2].hp
