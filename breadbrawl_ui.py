@@ -108,11 +108,35 @@ def main():
         p2_loaf = st.session_state.p2_loaf
         
         if game.terminated:
-            # Battle ended
+            # Battle ended - show final turn's attacks first
+            if st.session_state.attack_sequence:
+                st.subheader("⚔️ Final Battle Animation")
+                animation_placeholder = st.empty()
+                
+                # Show all attacks with 2-second display and wait for disappearance
+                for player, attack in st.session_state.attack_sequence:
+                    player_num = player.value + 1
+                    emoji = get_attack_emoji(attack)
+                    desc = get_attack_description(attack)
+                    
+                    if player_num == 1:
+                        with animation_placeholder.container():
+                            st.info(f"🔵 Player {player_num}: {emoji} {desc}")
+                    else:
+                        with animation_placeholder.container():
+                            st.warning(f"🔴 Player {player_num}: {emoji} {desc}")
+                    
+                    time.sleep(2)
+                    animation_placeholder.empty()
+                    time.sleep(0.3)
+                
+                st.session_state.attack_sequence = []
+                st.markdown("---")
+            
+            # Show battle result
             p1_hp = game.states[Player.p1].hp
             p2_hp = game.states[Player.p2].hp
             
-            st.markdown("---")
             if p1_hp > 0:
                 st.success("🎉 **Player 1 Wins!** 🎉", icon="✨")
             else:
@@ -173,7 +197,7 @@ def main():
                 st.rerun()
             else:
                 # Player 1 move selection
-                st.subheader("⚔️ Choose Your Move (Player 1)")
+                st.subheading("⚔️ Choose Your Move (Player 1)")
                 
                 p1_attacks = p1_loaf.action_space()
                 attack_buttons = st.columns(len(p1_attacks))
