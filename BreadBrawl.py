@@ -92,11 +92,6 @@ class BreadBrawl:
     def duel_env(cls, p1: Loaf, p2: Loaf):
         return cls(p1, p2)
 
-    # Method to return the state space shape
-    @staticmethod
-    def state_space_shape() -> tuple[int, ...]:
-        return 32, 2, 4, 4, 32, 2, 4, 4
-
     # Method for handling the effects of attacks
     def _perform_attack(self, attack: Attack, user: Player):
         if not self.terminated:
@@ -127,7 +122,7 @@ class BreadBrawl:
     def reset(self):
         self.states = {Player.p1: PlayerState(self.players[Player.p1].flour, 0, 0, 0), Player.p2: PlayerState(self.players[Player.p2].flour, 0, 0, 0)}
         self.terminated = False
-        return self.states
+        return self.states[Player.p1].to_tuple() + self.states[Player.p2].to_tuple()
 
     # Method for stepping a training environment (adversarial policies still needed)
     def step_1p(self, p1att: Attack):
