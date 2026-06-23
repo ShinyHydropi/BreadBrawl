@@ -154,7 +154,12 @@ class BreadBrawl:
 
         for _, player, attack in order:
             self._perform_attack(attack, player)
-            output_sequence.append((player, attack))
+
+            # Checks if either player was knocked out
+            if self.states[Player.p1].hp == 0 or self.states[Player.p2].hp == 0:
+                self.terminated = True
+            else:
+                output_sequence.append((player, attack))
         #
         # if p1att == Attack.block: # Performs any blocks before other attacks
         #     self._perform_attack(p1att, Player.p1)
@@ -202,10 +207,6 @@ class BreadBrawl:
         self.states[Player.p2].sprint = max(0, self.states[Player.p2].sprint - 1)
         self.states[Player.p1].power_up = max(0, self.states[Player.p1].power_up - 1)
         self.states[Player.p2].power_up = max(0, self.states[Player.p2].power_up - 1)
-
-        # Checks if either player was knocked out
-        if self.states[Player.p1].hp == 0 or self.states[Player.p2].hp == 0:
-            self.terminated = True
 
         # Returns the current state, a termination conditional, and the net change in hp after the turn
         return self.states[Player.p1].to_tuple() + self.states[Player.p2].to_tuple(), output_sequence, self.terminated, self.states[Player.p1].hp - i_hp_1 + i_hp_2 - self.states[Player.p2].hp
