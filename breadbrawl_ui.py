@@ -15,6 +15,7 @@ if "game" not in st.session_state:
     st.session_state.turn_active = False
     st.session_state.attack_sequence = []
     st.session_state.attack_index = 0
+    st.session_state.move_log = []
 
 def init_game():
     """Initialize a new game with random loaves."""
@@ -26,6 +27,7 @@ def init_game():
     st.session_state.turn_active = False
     st.session_state.attack_sequence = []
     st.session_state.attack_index = 0
+    st.session_state.move_log = []
 
 def get_attack_emoji(attack: Attack) -> str:
     """Get emoji representation for attack types."""
@@ -90,6 +92,17 @@ def display_loaf(player: Player, loaf: Loaf, state, col):
         if effects:
             st.info(" | ".join(effects))
 
+def display_move_log(col):
+    """Display the move log in a sidebar."""
+    with col:
+        st.subheader("📜 Move Log")
+        if st.session_state.move_log:
+            # Display moves in reverse order (most recent at top)
+            log_text = "\n".join(reversed(st.session_state.move_log))
+            st.text_area("Battle History", value=log_text, height=400, disabled=True)
+        else:
+            st.info("No moves yet...")
+
 def main():
     if not st.session_state.game_started:
         # Start screen
@@ -107,55 +120,57 @@ def main():
         p1_loaf = st.session_state.p1_loaf
         p2_loaf = st.session_state.p2_loaf
         
-
-        col1, col2 = st.columns(2)
-
+        # Create three columns: left for Player 1, middle for Player 2, right for move log
+        left_col, middle_col, right_col = st.columns([1, 1, 1])
+        
         p1_state = game.states[Player.p1]
         p2_state = game.states[Player.p2]
-
-        display_loaf(Player.p1, p1_loaf, p1_state, col1)
-        display_loaf(Player.p2, p2_loaf, p2_state, col2)
-
+        
+        display_loaf(Player.p1, p1_loaf, p1_state, left_col)
+        display_loaf(Player.p2, p2_loaf, p2_state, middle_col)
+        display_move_log(right_col)
+        
         st.markdown("---")
-
+        
         if st.session_state.turn_active:
             # Display attack sequence animation
             st.subheader("⚔️ Battle Animation")
             animation_placeholder = st.empty()
-
+            
             # Show all attacks with 2-second display and wait for disappearance
             for player, attack in st.session_state.attack_sequence:
                 player_num = player.value + 1
                 emoji = get_attack_emoji(attack)
                 desc = get_attack_description(attack)
-
+                
                 if player_num == 1:
                     with animation_placeholder.container():
                         st.info(f"🔵 Player {player_num}: {emoji} {desc}")
                 else:
                     with animation_placeholder.container():
                         st.warning(f"🔴 Player {player_num}: {emoji} {desc}")
-
+                
                 time.sleep(2)
                 animation_placeholder.empty()
                 time.sleep(0.3)
-
-            # After animation, show updated stats
-            # st.markdown("---")
-            # st.subheader("📊 Updated Battle Status")
-            # col1, col2 = st.columns(2)
-            #
-            # display_loaf(Player.p1, p1_loaf, game.states[Player.p1], col1)
-            # display_loaf(Player.p2, p2_loaf, game.states[Player.p2], col2)
-
+            
+            # Add moves to log
+            for player, attack in st.session_state.attack_sequence:
+                player_num = player.value + 1
+                emoji = get_attack_emoji(attack)
+                desc = get_attack_description(attack)
+                st.session_state.move_log.append(f"P{player_num}: {emoji} {desc}")
+            
             if game.terminated:
+                # Battle ended - show win screen
+                st.markdown("---")
                 if p1_state.hp > 0:
                     st.success("🎉 **Player 1 Wins!** 🎉", icon="✨")
                 else:
                     st.error("🎉 **Player 2 Wins!** 🎉", icon="☠️")
-
+                
                 st.markdown("---")
-
+                
                 if st.button("🔄 New Battle", key="restart_btn", use_container_width=True):
                     st.session_state.game_started = False
                     st.session_state.game = None
@@ -169,10 +184,10 @@ def main():
         else:
             # Player 1 move selection
             st.subheader("⚔️ Choose Your Move (Player 1)")
-
+            
             p1_attacks = p1_loaf.action_space()
             attack_buttons = st.columns(len(p1_attacks))
-
+            
             p1_choice = None
             for i, (button_col, attack) in enumerate(zip(attack_buttons, p1_attacks)):
                 with button_col:
@@ -180,18 +195,18 @@ def main():
                     desc = get_attack_description(attack)
                     if st.button(f"{emoji}\n{desc}", key=f"attack_{attack.name}", use_container_width=True):
                         p1_choice = attack
-
+            
             if p1_choice:
                 # Player 2 makes random choice
                 p2_choice = p2_loaf.random_attack()
-
+                
                 # Execute turn
                 state_tuple, move_sequence, terminated, reward = game.step_2p(p1_choice, p2_choice)
-
+                
                 # move_sequence is a list of (Player, Attack) tuples in resolution order
                 st.session_state.attack_sequence = move_sequence
                 st.session_state.turn_active = True
-
+                
                 st.rerun()
 
 if __name__ == "__main__":
