@@ -169,14 +169,14 @@ class BreadBrawl:
         print(order)
 
         for _, player, attack in order:
-            self._perform_attack(attack, player)
-
-            # Checks if either player was knocked out
-            if self.states[Player.p1].hp == 0 or self.states[Player.p2].hp == 0:
-                self.terminated = True
-            else:
+            if not self.terminated:
+                # Performs the attack if the battle has not ended
+                self._perform_attack(attack, player)
                 output_sequence.append((player, attack))
-        #
+
+                # Checks if either player was knocked out
+                self.terminated = self.states[Player.p1].hp == 0 or self.states[Player.p2].hp == 0
+
         # if p1att == Attack.block: # Performs any blocks before other attacks
         #     self._perform_attack(p1att, Player.p1)
         #     move_sequence.append((Player.p1, p1att))
