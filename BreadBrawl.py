@@ -3,15 +3,15 @@ from dataclasses import dataclass
 import random
 
 # Attack descriptions:
-# Block - Acts first; fails if used last turn; protects the user from all damage this turn
 # Slash - Deals damage equal to the user's salt plus a small damage roll
+# Block - Acts first; fails if used last turn; protects the user from all damage this turn
 # Drain - Deals damage equal to 0.6x the user's salt plus a small damage roll and heals the damage dealt
 # Heal - Restores half the user's max flour
 # Sprint - Doubles user's sugar for three turns
 # Power-Up - Doubles user's Salt for three turns
 class Attack(Enum):
-    block = 0
-    slash = 1
+    slash = 0
+    block = 1
     drain = 2
     heal = 3
     sprint = 4
@@ -94,29 +94,45 @@ class BreadBrawl:
 
     # Method for handling the effects of attacks
     def _perform_attack(self, attack: Attack, user: Player):
-        if not self.terminated:
-            match attack:
-                case Attack.block:
-                    self.states[user].blocked = 1 - self.states[user].blocked
+        if self.terminated:
+            return
 
-                case Attack.slash:
-                    self.states[user.opponent()].hp -= (1 - self.states[user.opponent()].blocked) * (random.randrange(-2, 2) + (2 if self.states[user].power_up else 1) * self.players[user].salt)
-                    if self.states[user.opponent()].hp < 0:
-                        self.states[user.opponent()].hp = 0
+        damage = 0
+        heal = 0
+        opp_block = 0 if self.states[user.opponent()].blocked == 2 else 1
+        salt = self.players[user].salt
+        if self.states[user].power_up > 0:
+            salt *= 2
 
-                case Attack.drain:
-                    damage = min(self.states[user.opponent()].hp, (1 - self.states[user.opponent()].blocked) * (random.randrange(-2, 2) + int((2 if self.states[user].power_up else 1) * 0.6 * self.players[user].salt)))
-                    self.states[user.opponent()].hp -= damage
-                    self.states[user].hp = min(self.states[user].hp + damage, self.players[user].flour)
+        match attack:
+            case Attack.block:
+                self.states[user].blocked = 2 - self.states[user].blocked
 
-                case Attack.heal:
-                    self.states[user].hp = min(self.states[user].hp + self.players[user].flour // 2, self.players[user].flour)
+            case Attack.slash:
+                damage = random.randrange(-2, 2) + salt
+                # self.states[user.opponent()].hp -= (1 - self.states[user.opponent()].blocked) * (random.randrange(-2, 2) + (2 if self.states[user].power_up else 1) * self.players[user].salt)
+                # if self.states[user.opponent()].hp < 0:
+                #     self.states[user.opponent()].hp = 0
 
-                case Attack.sprint:
-                    self.states[user].sprint = 4
+            case Attack.drain:
+                damage = random.randrange(-2, 2) + int(0.6 * salt)
+                heal = damage * opp_block
+                # damage = min(self.states[user.opponent()].hp, (1 - self.states[user.opponent()].blocked) * (random.randrange(-2, 2) + int((2 if self.states[user].power_up else 1) * 0.6 * self.players[user].salt)))
+                # self.states[user.opponent()].hp -= damage
+                # self.states[user].hp = min(self.states[user].hp + damage, self.players[user].flour)
 
-                case Attack.power_up:
-                    self.states[user].power_up = 4
+            case Attack.heal:
+                heal = self.players[user].flour // 2
+                # self.states[user].hp = min(self.states[user].hp + self.players[user].flour // 2, self.players[user].flour)
+
+            case Attack.sprint:
+                self.states[user].sprint = 4
+
+            case Attack.power_up:
+                self.states[user].power_up = 4
+
+        self.states[user.opponent()].hp = max(0, self.states[user.opponent()].hp - damage * opp_block)
+        self.states[user].hp = min(self.players[user].flour, self.states[user].hp + heal)
 
     # Method for resetting the environment
     def reset(self):
@@ -169,8 +185,8 @@ class BreadBrawl:
         #     self._perform_attack(p2att, Player.p2)
         #     move_sequence.append((Player.p2, p2att))
 
-        self.states[Player.p1].blocked = 0 # Decrements blocked to begin the turn (since blocked indicates a block last turn and handles the effect of blocking)
-        self.states[Player.p2].blocked = 0
+        # self.states[Player.p1].blocked = 0 # Decrements blocked to begin the turn (since blocked indicates a block last turn and handles the effect of blocking)
+        # self.states[Player.p2].blocked = 0
 
         # # Handles remaining sequence of attacks
         # if self.states[Player.p1].blocked == 0 and self.states[Player.p2].blocked == 0:
@@ -202,7 +218,9 @@ class BreadBrawl:
         #     self._perform_attack(p2att, Player.p2)
         #     move_sequence.append((Player.p2, p2att))
 
-        # Decrements the sprint and power_up turn counters for both players
+        # Decrements the turn counters for both players
+        self.states[Player.p1].blocked = max(0, self.states[Player.p1].blocked - 1)
+        self.states[Player.p2].blocked = max(0, self.states[Player.p2].blocked - 1)
         self.states[Player.p1].sprint = max(0, self.states[Player.p1].sprint - 1)
         self.states[Player.p2].sprint = max(0, self.states[Player.p2].sprint - 1)
         self.states[Player.p1].power_up = max(0, self.states[Player.p1].power_up - 1)
