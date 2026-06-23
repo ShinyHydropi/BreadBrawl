@@ -92,16 +92,16 @@ def display_loaf(player: Player, loaf: Loaf, state, col):
         if effects:
             st.info(" | ".join(effects))
 
-def display_move_log(col):
+def display_move_log(col, hold):
     """Display the move log in a sidebar."""
     with col:
-        st.subheader("📜 Move Log")
+        hold.empty()
         if st.session_state.move_log:
             # Display moves in reverse order (most recent at top)
             log_text = "\n".join(reversed(st.session_state.move_log))
-            st.text_area("Battle History", value=log_text, height=600, disabled=True)
+            hold.text_area("Battle History", value=log_text, height=600, disabled=True)
         else:
-            st.info("No moves yet...")
+            hold.info("No moves yet...")
 
 def main():
     if not st.session_state.game_started:
@@ -117,6 +117,9 @@ def main():
     else:
         # Game screen - create main content area and move log sidebar
         main_content, log_col = st.columns([2, 1])
+        with log_col:
+            st.subheader("📜 Move Log")
+        log_holder = log_col.empty()
         
         game = st.session_state.game
         p1_loaf = st.session_state.p1_loaf
@@ -126,7 +129,7 @@ def main():
         p2_state = game.states[Player.p2]
         
         # Display move log on right side
-        display_move_log(log_col)
+        display_move_log(log_col, log_holder)
         
         with main_content:
             # Create two columns for players
@@ -165,6 +168,7 @@ def main():
                     emoji = get_attack_emoji(attack)
                     desc = get_attack_description(attack)
                     st.session_state.move_log.append(f"P{player_num}: {emoji} {desc}")
+                    display_move_log(log_col, log_holder)
                 
                 if game.terminated:
                     # Battle ended - show win screen
