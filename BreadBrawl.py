@@ -157,18 +157,20 @@ class BreadBrawl:
         if not (p1att in self.players[Player.p1].attacks):
             raise ValueError("p1att not in player")
 
+        tiebreak = random.randint(0,1)
         for player, attack in actions:
             priority = -self.players[player].sugar
             if self.states[player].sprint > 0:
                 priority *= 2
             if attack == Attack.block:
                 priority -= 100
-            order.append((priority, player, attack))
+            order.append((priority, tiebreak, player, attack))
+            tiebreak = 1 - tiebreak
 
         order.sort()
         print(order)
 
-        for _, player, attack in order:
+        for _, _, player, attack in order:
             if not self.terminated:
                 # Performs the attack if the battle has not ended
                 self._perform_attack(attack, player)
