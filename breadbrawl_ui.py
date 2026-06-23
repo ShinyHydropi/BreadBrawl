@@ -141,12 +141,12 @@ def main():
                 time.sleep(0.3)
 
             # After animation, show updated stats
-            st.markdown("---")
-            st.subheader("📊 Updated Battle Status")
-            col1, col2 = st.columns(2)
-
-            display_loaf(Player.p1, p1_loaf, game.states[Player.p1], col1)
-            display_loaf(Player.p2, p2_loaf, game.states[Player.p2], col2)
+            # st.markdown("---")
+            # st.subheader("📊 Updated Battle Status")
+            # col1, col2 = st.columns(2)
+            #
+            # display_loaf(Player.p1, p1_loaf, game.states[Player.p1], col1)
+            # display_loaf(Player.p2, p2_loaf, game.states[Player.p2], col2)
 
             if game.terminated:
                 if p1_state.hp > 0:
