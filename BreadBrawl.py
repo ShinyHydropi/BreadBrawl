@@ -97,7 +97,7 @@ class BreadBrawl:
         if not self.terminated:
             match attack:
                 case Attack.block:
-                    self.states[user].blocked = 1
+                    self.states[user].blocked = 1 - self.states[user].blocked
 
                 case Attack.slash:
                     self.states[user.opponent()].hp -= (1 - self.states[user.opponent()].blocked) * (random.randrange(-2, 2) + (2 if self.states[user].power_up else 1) * self.players[user].salt)
@@ -107,10 +107,10 @@ class BreadBrawl:
                 case Attack.drain:
                     damage = min(self.states[user.opponent()].hp, (1 - self.states[user.opponent()].blocked) * (random.randrange(-2, 2) + int((2 if self.states[user].power_up else 1) * 0.6 * self.players[user].salt)))
                     self.states[user.opponent()].hp -= damage
-                    self.states[user].hp += damage
+                    self.states[user].hp = min(self.states[user].hp + damage, self.players[user].flour)
 
                 case Attack.heal:
-                    self.states[user].hp = min(self.states[user].hp + self.players[user].flour >> 2, self.players[user].flour)
+                    self.states[user].hp = min(self.states[user].hp + self.players[user].flour // 2, self.players[user].flour)
 
                 case Attack.sprint:
                     self.states[user].sprint = 4
@@ -139,9 +139,6 @@ class BreadBrawl:
         if not (p1att in self.players[Player.p1].attacks):
             raise ValueError("p1att not in player")
 
-        self.states[Player.p1].blocked = 0 # Decrements blocked to begin the turn (since blocked indicates a block last turn and handles the effect of blocking)
-        self.states[Player.p2].blocked = 0
-
         if p1att == Attack.block: # Performs any blocks before other attacks
             self._perform_attack(p1att, Player.p1)
             move_sequence.append((Player.p1, p1att))
@@ -150,14 +147,17 @@ class BreadBrawl:
             self._perform_attack(p2att, Player.p2)
             move_sequence.append((Player.p2, p2att))
 
+        self.states[Player.p1].blocked = 0 # Decrements blocked to begin the turn (since blocked indicates a block last turn and handles the effect of blocking)
+        self.states[Player.p2].blocked = 0
+
         # Handles remaining sequence of attacks
         if self.states[Player.p1].blocked == 0 and self.states[Player.p2].blocked == 0:
-            if self.players[Player.p1].sugar * (2 if self.states[Player.p1].sprint else 1) > self.players[Player.p2].flour * (2 if self.states[Player.p1].sprint else 1):
+            if self.players[Player.p1].sugar * (2 if self.states[Player.p1].sprint else 1) > self.players[Player.p2].sugar * (2 if self.states[Player.p1].sprint else 1):
                 self._perform_attack(p1att, Player.p1)
                 move_sequence.append((Player.p1, p1att))
                 self._perform_attack(p2att, Player.p2)
                 move_sequence.append((Player.p2, p2att))
-            elif self.players[Player.p1].sugar * (2 if self.states[Player.p1].sprint else 1) < self.players[Player.p2].flour * (2 if self.states[Player.p1].sprint else 1):
+            elif self.players[Player.p1].sugar * (2 if self.states[Player.p1].sprint else 1) < self.players[Player.p2].sugar * (2 if self.states[Player.p1].sprint else 1):
                 self._perform_attack(p2att, Player.p2)
                 move_sequence.append((Player.p2, p2att))
                 self._perform_attack(p1att, Player.p1)
