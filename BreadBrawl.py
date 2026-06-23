@@ -208,4 +208,4 @@ class BreadBrawl:
             self.terminated = True
 
         # Returns the current state, a termination conditional, and the net change in hp after the turn
-        return self.states[Player.p1].to_tuple() + self.states[Player.p2].to_tuple(), move_sequence, self.terminated, self.states[Player.p1].hp - i_hp_1 + i_hp_2 - self.states[Player.p2].hp
+        return self.states[Player.p1].to_tuple() + self.states[Player.p2].to_tuple(), output_sequence, self.terminated, self.states[Player.p1].hp - i_hp_1 + i_hp_2 - self.states[Player.p2].hp
