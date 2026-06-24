@@ -56,7 +56,11 @@ def get_attack_description(attack: Attack) -> str:
 def display_loaf(player: Player, loaf: Loaf, state, col):
     """Display loaf character with stats."""
     with col:
-        st.subheader(f"Player {player.value + 1} - 🍞")
+        # st.subheader(f"Player {player.value + 1} - 🍞")
+        if player == Player.p1:
+            st.subheader(f"Your Loaf")
+        else:
+            st.subheader(f"CPU")
         
         # Display loaf art (simple text representation)
         st.markdown("""
@@ -68,11 +72,11 @@ def display_loaf(player: Player, loaf: Loaf, state, col):
         # Display stats
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.metric("Attack", loaf.salt)
+            st.metric("Salt (Attack)", loaf.salt)
         with col2:
-            st.metric("Speed", loaf.sugar)
+            st.metric("Sugar (Speed)", loaf.sugar)
         with col3:
-            st.metric("Max HP", loaf.flour)
+            st.metric("Flour (Hit Points)", loaf.flour)
         
         # Health progress bar
         current_hp = state.hp
