@@ -179,54 +179,11 @@ class BreadBrawl:
                 # Checks if either player was knocked out
                 self.terminated = self.states[Player.p1].hp == 0 or self.states[Player.p2].hp == 0
 
-        # if p1att == Attack.block: # Performs any blocks before other attacks
-        #     self._perform_attack(p1att, Player.p1)
-        #     move_sequence.append((Player.p1, p1att))
-        #
-        # if p2att == Attack.block:
-        #     self._perform_attack(p2att, Player.p2)
-        #     move_sequence.append((Player.p2, p2att))
-
-        # self.states[Player.p1].blocked = 0 # Decrements blocked to begin the turn (since blocked indicates a block last turn and handles the effect of blocking)
-        # self.states[Player.p2].blocked = 0
-
-        # # Handles remaining sequence of attacks
-        # if self.states[Player.p1].blocked == 0 and self.states[Player.p2].blocked == 0:
-        #     if self.players[Player.p1].sugar * (2 if self.states[Player.p1].sprint else 1) > self.players[Player.p2].sugar * (2 if self.states[Player.p1].sprint else 1):
-        #         self._perform_attack(p1att, Player.p1)
-        #         move_sequence.append((Player.p1, p1att))
-        #         self._perform_attack(p2att, Player.p2)
-        #         move_sequence.append((Player.p2, p2att))
-        #     elif self.players[Player.p1].sugar * (2 if self.states[Player.p1].sprint else 1) < self.players[Player.p2].sugar * (2 if self.states[Player.p1].sprint else 1):
-        #         self._perform_attack(p2att, Player.p2)
-        #         move_sequence.append((Player.p2, p2att))
-        #         self._perform_attack(p1att, Player.p1)
-        #         move_sequence.append((Player.p1, p1att))
-        #     else:
-        #         if random.randint(0, 1):
-        #             self._perform_attack(p1att, Player.p1)
-        #             move_sequence.append((Player.p1, p1att))
-        #             self._perform_attack(p2att, Player.p2)
-        #             move_sequence.append((Player.p2, p2att))
-        #         else:
-        #             self._perform_attack(p2att, Player.p2)
-        #             move_sequence.append((Player.p2, p2att))
-        #             self._perform_attack(p1att, Player.p1)
-        #             move_sequence.append((Player.p1, p1att))
-        # elif self.states[Player.p1].blocked == 0:
-        #     self._perform_attack(p1att, Player.p1)
-        #     move_sequence.append((Player.p1, p1att))
-        # elif self.states[Player.p2].blocked == 0:
-        #     self._perform_attack(p2att, Player.p2)
-        #     move_sequence.append((Player.p2, p2att))
-
         # Decrements the turn counters for both players
-        self.states[Player.p1].blocked = max(0, self.states[Player.p1].blocked - 1)
-        self.states[Player.p2].blocked = max(0, self.states[Player.p2].blocked - 1)
-        self.states[Player.p1].sprint = max(0, self.states[Player.p1].sprint - 1)
-        self.states[Player.p2].sprint = max(0, self.states[Player.p2].sprint - 1)
-        self.states[Player.p1].power_up = max(0, self.states[Player.p1].power_up - 1)
-        self.states[Player.p2].power_up = max(0, self.states[Player.p2].power_up - 1)
+        for p in list(Player):
+            self.states[p].blocked = max(0, self.states[p].blocked - 1)
+            self.states[p].sprint = max(0, self.states[p].sprint - 1)
+            self.states[p].power_up = max(0, self.states[p].power_up - 1)
 
         # Returns the current state, a termination conditional, and the net change in hp after the turn
         return self.states[Player.p1].to_tuple() + self.states[Player.p2].to_tuple(), output_sequence, self.terminated, self.states[Player.p1].hp - i_hp_1 + i_hp_2 - self.states[Player.p2].hp
