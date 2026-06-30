@@ -168,7 +168,6 @@ class BreadBrawl:
             tiebreak = 1 - tiebreak
 
         order.sort()
-        print(order)
 
         for _, _, player, attack in order:
             if not self.terminated:
