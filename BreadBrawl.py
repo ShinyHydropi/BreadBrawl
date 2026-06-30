@@ -60,7 +60,7 @@ class Loaf:
         points: list[int] = sorted([0] + cuts + [6])
         flour, salt, sugar = (points[i+1] - points[i] for i in range(3))
 
-        return cls(flour,salt,sugar,random.sample(list(Attack), 4))
+        return cls(flour,salt,sugar,set(random.sample(list(Attack)[1:], 3)) | {Attack.slash})
 
     def __cmp__(self, other):
         return self.sugar - other.sugar
