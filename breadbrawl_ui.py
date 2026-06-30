@@ -1,3 +1,5 @@
+# Generated using Copilot https://github.com/copilot/share/0a470230-4bc0-8842-b943-4a478003691e
+
 import streamlit as st
 import time
 from BreadBrawl import BreadBrawl, Loaf, Attack, Player
