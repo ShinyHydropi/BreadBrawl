@@ -34,24 +34,24 @@ def init_game():
 def get_attack_emoji(attack: Attack) -> str:
     """Get emoji representation for attack types."""
     emoji_map = {
-        Attack.block: "🛡️",
-        Attack.slash: "⚔️",
-        Attack.drain: "🩸",
-        Attack.heal: "💚",
-        Attack.sprint: "💨",
-        Attack.power_up: "⭐",
+        Attack.BLOCK: "🛡️",
+        Attack.SLASH: "⚔️",
+        Attack.DRAIN: "🩸",
+        Attack.HEAL: "💚",
+        Attack.SPRINT: "💨",
+        Attack.POWER_UP: "⭐",
     }
     return emoji_map.get(attack, "")
 
 def get_attack_description(attack: Attack) -> str:
     """Get description for attack types."""
     descriptions = {
-        Attack.block: "Block",
-        Attack.slash: "Slash",
-        Attack.drain: "Drain",
-        Attack.heal: "Heal",
-        Attack.sprint: "Sprint",
-        Attack.power_up: "Power-Up",
+        Attack.BLOCK: "Block",
+        Attack.SLASH: "Slash",
+        Attack.DRAIN: "Drain",
+        Attack.HEAL: "Heal",
+        Attack.SPRINT: "Sprint",
+        Attack.POWER_UP: "Power-Up",
     }
     return descriptions.get(attack, attack.name)
 
@@ -59,7 +59,7 @@ def display_loaf(player: Player, loaf: Loaf, state, col):
     """Display loaf character with stats."""
     with col:
         # st.subheader(f"Player {player.value + 1} - 🍞")
-        if player == Player.p1:
+        if player == Player.P1:
             st.subheader(f"Your Loaf")
         else:
             st.subheader(f"CPU")
@@ -88,10 +88,10 @@ def display_loaf(player: Player, loaf: Loaf, state, col):
         
         # Active effects
         effects = []
-        if state.sprint > 0:
-            effects.append(f"💨 Sprint ({state.sprint})")
-        if state.power_up > 0:
-            effects.append(f"⭐ Power-Up ({state.power_up})")
+        if state.sprint_turns > 0:
+            effects.append(f"💨 Sprint ({state.sprint_turns})")
+        if state.power_up_turns > 0:
+            effects.append(f"⭐ Power-Up ({state.power_up_turns})")
         if state.blocked > 0:
             effects.append("🛡️ Blocked")
         
@@ -131,8 +131,8 @@ def main():
         p1_loaf = st.session_state.p1_loaf
         p2_loaf = st.session_state.p2_loaf
         
-        p1_state = game.states[Player.p1]
-        p2_state = game.states[Player.p2]
+        p1_state = game.states[Player.P1]
+        p2_state = game.states[Player.P2]
         
         # Display move log on right side
         display_move_log(log_col, log_holder)
@@ -141,8 +141,8 @@ def main():
             # Create two columns for players
             left_col, right_col = st.columns(2)
             
-            display_loaf(Player.p1, p1_loaf, p1_state, left_col)
-            display_loaf(Player.p2, p2_loaf, p2_state, right_col)
+            display_loaf(Player.P1, p1_loaf, p1_state, left_col)
+            display_loaf(Player.P2, p2_loaf, p2_state, right_col)
             
             st.markdown("---")
             

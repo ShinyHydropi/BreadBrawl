@@ -10,16 +10,16 @@ import random
 # Sprint - Doubles user's sugar for three turns
 # Power-Up - Doubles user's Salt for three turns
 class Attack(Enum):
-    slash = 0
-    block = 1
-    drain = 2
-    heal = 3
-    sprint = 4
-    power_up = 5
+    SLASH = 0
+    BLOCK = 1
+    DRAIN = 2
+    HEAL = 3
+    SPRINT = 4
+    POWER_UP = 5
 
 class Player(Enum):
-    p1 = 0
-    p2 = 1
+    P1 = 0
+    P2 = 1
 
     # Returns the opposing players enum
     def opponent(self):
@@ -30,12 +30,12 @@ class Player(Enum):
 class PlayerState:
     hp: int
     blocked: int
-    sprint: int
-    power_up: int
+    sprint_turns: int
+    power_up_turns: int
 
     # Method to convert to tuples for observation from an agent
     def to_tuple(self):
-        return self.hp, self.blocked, self.sprint, self.power_up
+        return self.hp, self.blocked, self.sprint_turns, self.power_up_turns
 
 # Loaf class for creating bread loaves to battle with
 # flour is your hp, salt is your attack, and sugar is your speed
@@ -60,7 +60,7 @@ class Loaf:
         points: list[int] = sorted([0] + cuts + [6])
         flour, salt, sugar = (points[i+1] - points[i] for i in range(3))
 
-        return cls(flour,salt,sugar,set(random.sample(list(Attack)[1:], 3)) | {Attack.slash})
+        return cls(flour, salt, sugar, set(random.sample(list(Attack)[1:], 3)) | {Attack.SLASH})
 
     def __cmp__(self, other):
         return self.sugar - other.sugar
@@ -79,7 +79,7 @@ class BreadBrawl:
         self.states = None
         if p2 is None:
             p2 = Loaf.random_loaf()
-        self.players = {Player.p1: p1, Player.p2: p2}
+        self.players = {Player.P1: p1, Player.P2: p2}
         self.terminated = True
 
     # Constructor for training an agent
@@ -101,68 +101,68 @@ class BreadBrawl:
         heal = 0
         opp_block = 0 if self.states[user.opponent()].blocked == 2 else 1
         salt = self.players[user].salt
-        if self.states[user].power_up > 0:
+        if self.states[user].power_up_turns > 0:
             salt *= 2
 
         match attack:
-            case Attack.block:
+            case Attack.BLOCK:
                 self.states[user].blocked = 2 - self.states[user].blocked
 
-            case Attack.slash:
+            case Attack.SLASH:
                 damage = random.randrange(-2, 2) + salt
                 # self.states[user.opponent()].hp -= (1 - self.states[user.opponent()].blocked) * (random.randrange(-2, 2) + (2 if self.states[user].power_up else 1) * self.players[user].salt)
                 # if self.states[user.opponent()].hp < 0:
                 #     self.states[user.opponent()].hp = 0
 
-            case Attack.drain:
+            case Attack.DRAIN:
                 damage = random.randrange(-2, 2) + int(0.6 * salt)
                 heal = damage * opp_block
                 # damage = min(self.states[user.opponent()].hp, (1 - self.states[user.opponent()].blocked) * (random.randrange(-2, 2) + int((2 if self.states[user].power_up else 1) * 0.6 * self.players[user].salt)))
                 # self.states[user.opponent()].hp -= damage
                 # self.states[user].hp = min(self.states[user].hp + damage, self.players[user].flour)
 
-            case Attack.heal:
+            case Attack.HEAL:
                 heal = self.players[user].flour // 2
                 # self.states[user].hp = min(self.states[user].hp + self.players[user].flour // 2, self.players[user].flour)
 
-            case Attack.sprint:
-                self.states[user].sprint = 4
+            case Attack.SPRINT:
+                self.states[user].sprint_turns = 4
 
-            case Attack.power_up:
-                self.states[user].power_up = 4
+            case Attack.POWER_UP:
+                self.states[user].power_up_turns = 4
 
         self.states[user.opponent()].hp = max(0, self.states[user.opponent()].hp - damage * opp_block)
         self.states[user].hp = min(self.players[user].flour, self.states[user].hp + heal)
 
     # Method for resetting the environment
     def reset(self):
-        self.states = {Player.p1: PlayerState(self.players[Player.p1].flour, 0, 0, 0), Player.p2: PlayerState(self.players[Player.p2].flour, 0, 0, 0)}
+        self.states = {Player.P1: PlayerState(self.players[Player.P1].flour, 0, 0, 0), Player.P2: PlayerState(self.players[Player.P2].flour, 0, 0, 0)}
         self.terminated = False
-        return self.states[Player.p1].to_tuple() + self.states[Player.p2].to_tuple()
+        return self.states[Player.P1].to_tuple() + self.states[Player.P2].to_tuple()
 
     # Method for stepping a training environment (adversarial policies still needed)
     def step_1p(self, p1att: Attack):
-        return self.step_2p(p1att, self.players[Player.p2].random_attack())
+        return self.step_2p(p1att, self.players[Player.P2].random_attack())
 
     # Method for stepping the environment by performing the attacks selected by each agent
     def step_2p(self, p1att: Attack, p2att: Attack):
-        i_hp_1 = self.states[Player.p1].hp
-        i_hp_2 = self.states[Player.p2].hp
-        actions = [(Player.p1, p1att), (Player.p2, p2att)]
+        i_hp_1 = self.states[Player.P1].hp
+        i_hp_2 = self.states[Player.P2].hp
+        actions = [(Player.P1, p1att), (Player.P2, p2att)]
         order = []
         output_sequence = []
 
-        if not (p2att in self.players[Player.p2].attacks):
+        if not (p2att in self.players[Player.P2].attacks):
             raise ValueError("p2att not in player")
-        if not (p1att in self.players[Player.p1].attacks):
+        if not (p1att in self.players[Player.P1].attacks):
             raise ValueError("p1att not in player")
 
         tiebreak = random.randint(0,1)
         for player, attack in actions:
             priority = -self.players[player].sugar
-            if self.states[player].sprint > 0:
+            if self.states[player].sprint_turns > 0:
                 priority *= 2
-            if attack == Attack.block:
+            if attack == Attack.BLOCK:
                 priority -= 100
             order.append((priority, tiebreak, player, attack))
             tiebreak = 1 - tiebreak
@@ -176,13 +176,13 @@ class BreadBrawl:
                 output_sequence.append((player, attack))
 
                 # Checks if either player was knocked out
-                self.terminated = self.states[Player.p1].hp == 0 or self.states[Player.p2].hp == 0
+                self.terminated = self.states[Player.P1].hp == 0 or self.states[Player.P2].hp == 0
 
         # Decrements the turn counters for both players
         for p in list(Player):
             self.states[p].blocked = max(0, self.states[p].blocked - 1)
-            self.states[p].sprint = max(0, self.states[p].sprint - 1)
-            self.states[p].power_up = max(0, self.states[p].power_up - 1)
+            self.states[p].sprint_turns = max(0, self.states[p].sprint_turns - 1)
+            self.states[p].power_up_turns = max(0, self.states[p].power_up_turns - 1)
 
         # Returns the current state, a termination conditional, and the net change in hp after the turn
-        return self.states[Player.p1].to_tuple() + self.states[Player.p2].to_tuple(), output_sequence, self.terminated, self.states[Player.p1].hp - i_hp_1 + i_hp_2 - self.states[Player.p2].hp
+        return self.states[Player.P1].to_tuple() + self.states[Player.P2].to_tuple(), output_sequence, self.terminated, self.states[Player.P1].hp - i_hp_1 + i_hp_2 - self.states[Player.P2].hp
