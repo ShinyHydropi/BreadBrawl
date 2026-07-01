@@ -21,6 +21,11 @@ EPISODES = 100_000
 
 class DQNetwork(nn.Module):
     def __init__(self, loaf, state_dim, n_actions, hidden=128):
+        """
+        DQNetwork is a Neural Network with four fully-connected layers and uses ReLU as the activation function
+        for the middle layers (https://docs.pytorch.org/docs/2.12/generated/torch.nn.ReLU.html). nn.sequential
+        is used to string together the inputs and outputs of each layer into one function that is the network.
+        """
         super().__init__()
         self.loaf = loaf
         self.net = nn.Sequential(
@@ -32,9 +37,18 @@ class DQNetwork(nn.Module):
         )
 
     def forward(self, x):
+        """
+        forward(x) performs a forward pass through the network and returns the networks estimate of the Q-value
+        for each action at the current state.
+        """
         return self.net(x)
 
     def select_action(self, state):
+        """
+        select_action(state) is a helper function for forward(x) that takes a state and returns the action that
+        a greedy policy would select. Essentially, it selects the action with the highest expected returns
+        (Q-value).
+        """
         state_t = torch.as_tensor(state, dtype=torch.float32)
         q_values = self.net(state_t)
         max_q = torch.argmax(q_values)
@@ -42,18 +56,28 @@ class DQNetwork(nn.Module):
 
         return action
 
-# Initialization of environment, network, and training buffers
-agent = Loaf.random_loaf()
-print(agent)
-env = BreadBrawl.training_env(agent)
+# Replace the following line with one initializing your_loaf to be a Loaf with your choice of stats and moves
+your_loaf = Loaf.random_loaf()
 
+# Example:
+# your_loaf = Loaf(flour=2, salt=3, sugar=1, attacks={Attack.SLASH, Attack.BLOCK, Attack.POWER_UP, Attack.SPRINT})
+
+"""
+Some more objects we will need:
+env - The environment our agent is interacting with in order to train
+replay_buffer - This will store the 50,000 most recent episodes so we can collect many episodes before each
+    iteration of improving our agent (This also lets us use past training data while discarding the data that
+    is too old)
+reward_buffer - This keeps track of how well the agent is doing
+
+"""
+
+env = BreadBrawl.training_env(your_loaf)
 replay_buffer = deque(maxlen=BUFFER_SIZE)
 reward_buffer = deque([0.0], maxlen=100)
 
-episode_reward = 0.0
-
-online_net = DQNetwork(agent,8, len(agent.action_space()))
-target_net = DQNetwork(agent,8, len(agent.action_space()))
+online_net = DQNetwork(your_loaf, 8, len(your_loaf.action_space()))
+target_net = DQNetwork(your_loaf, 8, len(your_loaf.action_space()))
 
 target_net.load_state_dict(online_net.state_dict())
 
@@ -61,9 +85,9 @@ optimizer = torch.optim.Adam(online_net.parameters(), lr=5e-4)
 
 obs = env.reset()
 for _ in range(MIN_REPLAY_SIZE):
-    action = agent.random_attack()
+    action = your_loaf.random_attack()
     next_obs, _, done, reward = env.step_1p(action)
-    action = agent.action_space().index(action)
+    action = your_loaf.action_space().index(action)
     transition = (obs, action, done, reward, next_obs)
     replay_buffer.append(transition)
     obs = next_obs
@@ -71,17 +95,18 @@ for _ in range(MIN_REPLAY_SIZE):
     if done:
         obs = env.reset()
 
+episode_reward = 0.0
 obs = env.reset()
 for step in tqdm(range(EPISODES)):
     epsilon = np.interp(step, [0, EPSILON_DECAY], [EPSILON_START, EPSILON_END])
 
     if random.random() <= epsilon:
-        action = agent.random_attack()
+        action = your_loaf.random_attack()
     else:
         action = online_net.select_action(obs)
 
     next_obs, _, done, reward = env.step_1p(action)
-    action = agent.action_space().index(action)
+    action = your_loaf.action_space().index(action)
     transition = (obs, action, done, reward, next_obs)
     replay_buffer.append(transition)
     obs = next_obs
