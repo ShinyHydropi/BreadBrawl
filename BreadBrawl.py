@@ -75,7 +75,7 @@ class Loaf:
         return f"Loaf(Flour: {self.flour}, Salt: {self.salt}, Sugar: {self.sugar}, Attacks: {self.attacks})"
 
 class BreadBrawl:
-    def __init__(self, p1: Loaf, p2: Loaf):
+    def __init__(self, p1: Loaf, p2: Loaf|None = None):
         self.states = None
         if p2 is None:
             p2 = Loaf.random_loaf()
@@ -85,7 +85,7 @@ class BreadBrawl:
     # Constructor for training an agent
     @classmethod
     def training_env(cls, p1: Loaf):
-        return cls(p1, Loaf(2, 2, 2, random.sample(list(Attack), 4)))
+        return cls(p1, None)
 
     # Constructor for battling agents
     @classmethod
