@@ -3,19 +3,19 @@ from dataclasses import dataclass
 import random
 
 # Attack descriptions:
-# Slash - Deals damage equal to the user's salt plus a small damage roll
-# Block - Acts first; fails if used last turn; protects the user from all damage this turn
-# Drain - Deals damage equal to 0.6x the user's salt plus a small damage roll and heals the damage dealt
-# Heal - Restores half the user's max flour
-# Sprint - Doubles user's sugar for three turns
-# Power-Up - Doubles user's Salt for three turns
+# Crust Crusher - Deals damage equal to the user's salt plus a small damage roll
+# Oven Spring - Acts first; fails if used last turn; protects the user from all damage this turn
+# Leech Loaf - Deals damage equal to 0.6x the user's salt plus a small damage roll and heals the damage dealt
+# Second Rise - Restores half the user's max flour
+# Instant Yeast - Boosts user's sugar by 50% for three turns; fails if the boost is already active
+# Gluten Surge - Boosts user's salt by 50% for three turns; fails if the boost is already active
 class Attack(Enum):
-    SLASH = 0
-    BLOCK = 1
-    DRAIN = 2
-    HEAL = 3
-    SPRINT = 4
-    POWER_UP = 5
+    CRUST_CRUSHER = 0
+    OVEN_SPRING = 1
+    LEECH_LOAF = 2
+    SECOND_RISE = 3
+    INSTANT_YEAST = 4
+    GLUTEN_SURGE = 5
 
 class Player(Enum):
     P1 = 0
@@ -60,7 +60,7 @@ class Loaf:
         points: list[int] = sorted([0] + cuts + [6])
         flour, salt, sugar = (points[i+1] - points[i] for i in range(3))
 
-        return cls(flour, salt, sugar, set(random.sample(list(Attack)[1:], 3)) | {Attack.SLASH})
+        return cls(flour, salt, sugar, set(random.sample(list(Attack)[1:], 3)) | {Attack.CRUST_CRUSHER})
 
     def __cmp__(self, other):
         return self.sugar - other.sugar
@@ -105,30 +105,30 @@ class BreadBrawl:
             salt *= 2
 
         match attack:
-            case Attack.BLOCK:
+            case Attack.OVEN_SPRING:
                 self.states[user].blocked = 2 - self.states[user].blocked
 
-            case Attack.SLASH:
+            case Attack.CRUST_CRUSHER:
                 damage = random.randrange(-2, 2) + salt
                 # self.states[user.opponent()].hp -= (1 - self.states[user.opponent()].blocked) * (random.randrange(-2, 2) + (2 if self.states[user].power_up else 1) * self.players[user].salt)
                 # if self.states[user.opponent()].hp < 0:
                 #     self.states[user.opponent()].hp = 0
 
-            case Attack.DRAIN:
+            case Attack.LEECH_LOAF:
                 damage = random.randrange(-2, 2) + int(0.6 * salt)
                 heal = damage * opp_block
                 # damage = min(self.states[user.opponent()].hp, (1 - self.states[user.opponent()].blocked) * (random.randrange(-2, 2) + int((2 if self.states[user].power_up else 1) * 0.6 * self.players[user].salt)))
                 # self.states[user.opponent()].hp -= damage
                 # self.states[user].hp = min(self.states[user].hp + damage, self.players[user].flour)
 
-            case Attack.HEAL:
+            case Attack.SECOND_RISE:
                 heal = self.players[user].flour // 2
                 # self.states[user].hp = min(self.states[user].hp + self.players[user].flour // 2, self.players[user].flour)
 
-            case Attack.SPRINT:
+            case Attack.INSTANT_YEAST:
                 self.states[user].sprint_turns = 4
 
-            case Attack.POWER_UP:
+            case Attack.GLUTEN_SURGE:
                 self.states[user].power_up_turns = 4
 
         self.states[user.opponent()].hp = max(0, self.states[user.opponent()].hp - damage * opp_block)
@@ -162,7 +162,7 @@ class BreadBrawl:
             priority = -self.players[player].sugar
             if self.states[player].sprint_turns > 0:
                 priority *= 2
-            if attack == Attack.BLOCK:
+            if attack == Attack.OVEN_SPRING:
                 priority -= 100
             order.append((priority, tiebreak, player, attack))
             tiebreak = 1 - tiebreak

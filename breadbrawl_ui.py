@@ -34,24 +34,24 @@ def init_game():
 def get_attack_emoji(attack: Attack) -> str:
     """Get emoji representation for attack types."""
     emoji_map = {
-        Attack.BLOCK: "🛡️",
-        Attack.SLASH: "⚔️",
-        Attack.DRAIN: "🩸",
-        Attack.HEAL: "💚",
-        Attack.SPRINT: "💨",
-        Attack.POWER_UP: "⭐",
+        Attack.OVEN_SPRING: "🛡️",
+        Attack.CRUST_CRUSHER: "⚔️",
+        Attack.LEECH_LOAF: "🩸",
+        Attack.SECOND_RISE: "💚",
+        Attack.INSTANT_YEAST: "💨",
+        Attack.GLUTEN_SURGE: "⭐",
     }
     return emoji_map.get(attack, "")
 
 def get_attack_description(attack: Attack) -> str:
     """Get description for attack types."""
     descriptions = {
-        Attack.BLOCK: "Block",
-        Attack.SLASH: "Slash",
-        Attack.DRAIN: "Drain",
-        Attack.HEAL: "Heal",
-        Attack.SPRINT: "Sprint",
-        Attack.POWER_UP: "Power-Up",
+        Attack.OVEN_SPRING: "Oven Spring",
+        Attack.CRUST_CRUSHER: "Crust Crusher",
+        Attack.LEECH_LOAF: "Leech Loaf",
+        Attack.SECOND_RISE: "Second Rise",
+        Attack.INSTANT_YEAST: "Instant Yeast",
+        Attack.GLUTEN_SURGE: "Gluten Surge",
     }
     return descriptions.get(attack, attack.name)
 

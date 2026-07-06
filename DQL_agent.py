@@ -60,7 +60,7 @@ class DQNetwork(nn.Module):
 your_loaf = Loaf.random_loaf()
 
 # Example:
-# your_loaf = Loaf(flour=2, salt=3, sugar=1, attacks={Attack.SLASH, Attack.BLOCK, Attack.POWER_UP, Attack.SPRINT})
+# your_loaf = Loaf(flour=2, salt=3, sugar=1, attacks={Attack.CRUST_CRUSHER, Attack.OVEN_SPRING, Attack.GLUTEN_SURGE, Attack.INSTANT_YEAST})
 
 """
 Some more objects we will need:
