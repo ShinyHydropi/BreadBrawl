@@ -38,8 +38,8 @@ def get_attack_emoji(attack: Attack) -> str:
         Attack.CRUST_CRUSHER: "⚔️",
         Attack.LEECH_LOAF: "🩸",
         Attack.SECOND_RISE: "💚",
-        Attack.INSTANT_YEAST: "💨",
-        Attack.GLUTEN_SURGE: "⭐",
+        Attack.INSTANT_YEAST: "👟",
+        Attack.GLUTEN_SURGE: "💪",
     }
     return emoji_map.get(attack, "")
 
