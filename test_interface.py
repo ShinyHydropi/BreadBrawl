@@ -176,10 +176,10 @@ def main():
                     st.session_state.move_log.append(f"P{player_num}: {emoji} {desc}")
                     display_move_log(log_col, log_holder)
                 
-                if game.terminated:
+                if game.result:
                     # Battle ended - show win screen
                     st.markdown("---")
-                    if p1_state.hp > 0:
+                    if game.result == 1:
                         st.success("🎉 **Player 1 Wins!** 🎉", icon="✨")
                     else:
                         st.error("🎉 **Player 2 Wins!** 🎉", icon="☠️")
@@ -216,7 +216,7 @@ def main():
                     p2_choice = p2_loaf.random_attack()
                     
                     # Execute turn
-                    state_tuple, move_sequence, terminated, reward = game.step_2p(p1_choice, p2_choice)
+                    _, move_sequence, _, _ = game.step_2p(p1_choice, p2_choice)
                     
                     # move_sequence is a list of (Player, Attack) tuples in resolution order
                     st.session_state.attack_sequence = move_sequence

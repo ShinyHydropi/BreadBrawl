@@ -80,7 +80,7 @@ class BreadBrawl:
         if p2 is None:
             p2 = Loaf.random_loaf()
         self.players = {Player.P1: p1, Player.P2: p2}
-        self.terminated = True
+        self.result = 3
 
     # Constructor for training an agent
     @classmethod
@@ -94,7 +94,7 @@ class BreadBrawl:
 
     # Method for handling the effects of attacks
     def _perform_attack(self, attack: Attack, user: Player):
-        if self.terminated:
+        if self.result:
             return
 
         damage = 0
@@ -110,20 +110,13 @@ class BreadBrawl:
 
             case Attack.CRUST_CRUSHER:
                 damage = random.randrange(-2, 2) + salt
-                # self.states[user.opponent()].hp -= (1 - self.states[user.opponent()].blocked) * (random.randrange(-2, 2) + (2 if self.states[user].power_up else 1) * self.players[user].salt)
-                # if self.states[user.opponent()].hp < 0:
-                #     self.states[user.opponent()].hp = 0
 
             case Attack.LEECH_LOAF:
                 damage = random.randrange(-2, 2) + int(0.6 * salt)
                 heal = damage * opp_block
-                # damage = min(self.states[user.opponent()].hp, (1 - self.states[user.opponent()].blocked) * (random.randrange(-2, 2) + int((2 if self.states[user].power_up else 1) * 0.6 * self.players[user].salt)))
-                # self.states[user.opponent()].hp -= damage
-                # self.states[user].hp = min(self.states[user].hp + damage, self.players[user].flour)
 
             case Attack.SECOND_RISE:
                 heal = self.players[user].flour // 2
-                # self.states[user].hp = min(self.states[user].hp + self.players[user].flour // 2, self.players[user].flour)
 
             case Attack.INSTANT_YEAST:
                 self.states[user].sprint_turns = 4
@@ -137,7 +130,7 @@ class BreadBrawl:
     # Method for resetting the environment
     def reset(self):
         self.states = {Player.P1: PlayerState(self.players[Player.P1].flour, 0, 0, 0), Player.P2: PlayerState(self.players[Player.P2].flour, 0, 0, 0)}
-        self.terminated = False
+        self.result = 0
         return self.states[Player.P1].to_tuple() + self.states[Player.P2].to_tuple()
 
     # Method for stepping a training environment (adversarial policies still needed)
@@ -170,13 +163,16 @@ class BreadBrawl:
         order.sort()
 
         for _, _, player, attack in order:
-            if not self.terminated:
+            if not self.result:
                 # Performs the attack if the battle has not ended
                 self._perform_attack(attack, player)
                 output_sequence.append((player, attack))
 
                 # Checks if either player was knocked out
-                self.terminated = self.states[Player.P1].hp == 0 or self.states[Player.P2].hp == 0
+                if self.states[Player.P1].hp == 0:
+                    self.result += 1
+                if self.states[Player.P2].hp == 0:
+                    self.result += 2
 
         # Decrements the turn counters for both players
         for p in list(Player):
@@ -184,5 +180,5 @@ class BreadBrawl:
             self.states[p].sprint_turns = max(0, self.states[p].sprint_turns - 1)
             self.states[p].power_up_turns = max(0, self.states[p].power_up_turns - 1)
 
-        # Returns the current state, a termination conditional, and the net change in hp after the turn
-        return self.states[Player.P1].to_tuple() + self.states[Player.P2].to_tuple(), output_sequence, self.terminated, self.states[Player.P1].hp - i_hp_1 + i_hp_2 - self.states[Player.P2].hp
+        # Returns the current state, the result of the match if it has terminated, and the net change in hp after the turn
+        return self.states[Player.P1].to_tuple() + self.states[Player.P2].to_tuple(), output_sequence, self.result, self.states[Player.P1].hp - i_hp_1 + i_hp_2 - self.states[Player.P2].hp
