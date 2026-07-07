@@ -69,7 +69,7 @@ class Loaf:
         return list(self.attacks)
 
     def __copy__(self):
-        return Loaf(self.flour, self.salt, self.sugar, self.attacks)
+        return Loaf(self.flour - 25, self.salt - 10, self.sugar - 10, self.attacks)
 
     def __str__(self):
         return f"Loaf(Flour: {self.flour}, Salt: {self.salt}, Sugar: {self.sugar}, Attacks: {self.attacks})"
