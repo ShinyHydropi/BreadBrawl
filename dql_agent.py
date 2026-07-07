@@ -52,16 +52,19 @@ class DQNetwork(nn.Module):
         state_t = torch.as_tensor(state, dtype=torch.float32)
         q_values = self.net(state_t)
         max_q = torch.argmax(q_values)
-        action = self.loaf.action_space()[max_q.item()]
+        action = self.loaf.action_space[max_q.item()]
 
         return action
 
 if __name__ == "__main__":
-    # Replace the following line with one initializing your_loaf to be a Loaf with your choice of stats and moves
+    # Delete the following line
     your_loaf = Loaf.random_loaf()
 
+    # Uncomment the following line and create your own Loaf with the Loaf constructor in breadbrawl.py
+    # your_loaf = Loaf()
+
     # Example:
-    # your_loaf = Loaf(flour=2, salt=3, sugar=1, attacks={Attack.CRUST_CRUSHER, Attack.OVEN_SPRING, Attack.GLUTEN_SURGE, Attack.INSTANT_YEAST})
+    # your_loaf = Loaf(flour=2, salt=3, sugar=1, attacks=[Attack.CRUST_CRUSHER, Attack.OVEN_SPRING, Attack.GLUTEN_SURGE, Attack.INSTANT_YEAST])
 
     """
     Some more objects we will need:
@@ -80,8 +83,8 @@ if __name__ == "__main__":
     estimate of the Q-function, and one to keep fixed for many episodes at a time. This fixed network is used
     during policy evaluation as a stationary target for approximating the value of the next state.
     """
-    online_net = DQNetwork(your_loaf, 8, len(your_loaf.action_space()))
-    target_net = DQNetwork(your_loaf, 8, len(your_loaf.action_space()))
+    online_net = DQNetwork(your_loaf, 8, len(your_loaf.action_space))
+    target_net = DQNetwork(your_loaf, 8, len(your_loaf.action_space))
     target_net.load_state_dict(online_net.state_dict())
 
     """
@@ -98,7 +101,7 @@ if __name__ == "__main__":
     for _ in range(MIN_REPLAY_SIZE):
         action = your_loaf.random_attack()
         next_obs, _, done, reward = env.step_1p(action)
-        action = your_loaf.action_space().index(action)
+        action = your_loaf.action_space.index(action)
         transition = (obs, action, done, reward, next_obs)
         replay_buffer.append(transition)
         obs = next_obs
@@ -111,7 +114,7 @@ if __name__ == "__main__":
     env.reset() - Resets the environment for the next episode
     env.step_1p(action) - Changes the environment by the action the agent chose (The 1p means only one agent is
         selecting an action)
-    your_loaf.action_space() - Returns a list of all the attacks your_loaf can use
+    your_loaf.action_space - Returns a list of all the attacks your_loaf can use
     """
     episode_reward = 0.0
     obs = env.reset()
@@ -135,8 +138,7 @@ if __name__ == "__main__":
         are discarded.
         """
         next_obs, _, done, reward = env.step_1p(action)
-        action = your_loaf.action_space().index(action)
-        transition = (obs, action, done, reward, next_obs)
+        transition = (obs, your_loaf.action_space.index(action), done, reward, next_obs)
         replay_buffer.append(transition)
         obs = next_obs
 
@@ -200,3 +202,8 @@ if __name__ == "__main__":
             target_net.load_state_dict(online_net.state_dict())
     print(f"Average reward per episode: {np.mean(reward_buffer)}")
     torch.save(online_net.state_dict(), "model.pt")
+
+    import pickle
+
+    with open("loaf.pkl", "wb") as f:
+        pickle.dump(your_loaf, f)
