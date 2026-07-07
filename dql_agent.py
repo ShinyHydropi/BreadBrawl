@@ -6,7 +6,7 @@ import numpy as np
 from collections import deque
 import random
 
-from BreadBrawl import BreadBrawl, Loaf, Attack
+from breadbrawl import BreadBrawl, Loaf, Attack
 from tqdm import tqdm
 
 GAMMA = 0.99

@@ -2,7 +2,7 @@
 
 import streamlit as st
 import time
-from BreadBrawl import BreadBrawl, Loaf, Attack, Player
+from breadbrawl import BreadBrawl, Loaf, Attack, Player
 
 # Page configuration
 st.set_page_config(page_title="BreadBrawl", layout="wide")
