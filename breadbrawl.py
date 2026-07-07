@@ -62,14 +62,14 @@ class Loaf:
 
         return cls(flour, salt, sugar, set(random.sample(list(Attack)[1:], 3)) | {Attack.CRUST_CRUSHER})
 
-    def __cmp__(self, other):
-        return self.sugar - other.sugar
-
     def random_attack(self):
         return random.sample(self.action_space(), 1)[0]
 
     def action_space(self):
         return list(self.attacks)
+
+    def __copy__(self):
+        return Loaf(self.flour, self.salt, self.sugar, self.attacks)
 
     def __str__(self):
         return f"Loaf(Flour: {self.flour}, Salt: {self.salt}, Sugar: {self.sugar}, Attacks: {self.attacks})"
