@@ -200,7 +200,7 @@ def main():
                 # Player 1 move selection
                 st.subheader("⚔️ Choose Your Move (Player 1)")
                 
-                p1_attacks = p1_loaf.action_space()
+                p1_attacks = p1_loaf.action_space
                 attack_buttons = st.columns(len(p1_attacks))
                 
                 p1_choice = None

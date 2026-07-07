@@ -42,7 +42,7 @@ class PlayerState:
 # Your base stat spread is 25/10/10, and you can distribute 6 extra points among them
 # For your move set, select 4 moves from the attacks enum
 class Loaf:
-    def __init__(self, flour: int, salt: int, sugar: int, attacks: set[Attack]):
+    def __init__(self, flour: int, salt: int, sugar: int, attacks: list[Attack]):
         if not (0 <= flour + salt + sugar <= 6):
             raise ValueError("Extra points added to your stat spread must be between 0 and 6")
         if len(attacks) > 4 or len(attacks) == 0:
@@ -50,7 +50,8 @@ class Loaf:
         self.flour = 25 + flour
         self.salt = 10 + salt
         self.sugar = 10 + sugar
-        self.attacks = attacks
+        self.action_space = attacks
+        self.attacks = set(attacks)
 
     # method to generate a random Loaf
     @classmethod
@@ -59,17 +60,15 @@ class Loaf:
         cuts = random.choices(range(0, 7), k=2)
         points: list[int] = sorted([0] + cuts + [6])
         flour, salt, sugar = (points[i+1] - points[i] for i in range(3))
-
-        return cls(flour, salt, sugar, set(random.sample(list(Attack)[1:], 3)) | {Attack.CRUST_CRUSHER})
+        attacks = random.sample(list(Attack)[1:], 3)
+        attacks.append(Attack.CRUST_CRUSHER)
+        return cls(flour, salt, sugar, attacks)
 
     def random_attack(self):
-        return random.sample(self.action_space(), 1)[0]
-
-    def action_space(self):
-        return list(self.attacks)
+        return random.sample(self.action_space, 1)[0]
 
     def __copy__(self):
-        return Loaf(self.flour - 25, self.salt - 10, self.sugar - 10, self.attacks)
+        return Loaf(self.flour - 25, self.salt - 10, self.sugar - 10, self.action_space)
 
     def __str__(self):
         return f"Loaf(Flour: {self.flour}, Salt: {self.salt}, Sugar: {self.sugar}, Attacks: {self.attacks})"
