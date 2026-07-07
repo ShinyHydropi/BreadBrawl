@@ -133,7 +133,7 @@ class BreadBrawl:
         self.result = 0
         return self.states[Player.P1].to_tuple() + self.states[Player.P2].to_tuple()
 
-    # Method for stepping a training environment (adversarial policies still needed)
+    # Method for stepping a training environment
     def step_1p(self, p1att: Attack):
         return self.step_2p(p1att, self.players[Player.P2].random_attack())
 
@@ -146,9 +146,9 @@ class BreadBrawl:
         output_sequence = []
 
         if not (p2att in self.players[Player.P2].attacks):
-            raise ValueError("p2att not in player")
+            raise ValueError(f"{p2att} not in {self.players[Player.P2].attacks}")
         if not (p1att in self.players[Player.P1].attacks):
-            raise ValueError("p1att not in player")
+            raise ValueError(f"{p1att} not in {self.players[Player.P1].attacks}")
 
         tiebreak = random.randint(0,1)
         for player, attack in actions:
@@ -170,9 +170,9 @@ class BreadBrawl:
 
                 # Checks if either player was knocked out
                 if self.states[Player.P1].hp == 0:
-                    self.result += 1
-                if self.states[Player.P2].hp == 0:
                     self.result += 2
+                if self.states[Player.P2].hp == 0:
+                    self.result += 1
 
         # Decrements the turn counters for both players
         for p in list(Player):
