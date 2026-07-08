@@ -16,8 +16,6 @@ st.title("🍞 BreadBrawl RPG 🍞")
 # Initialize session state
 if "game" not in st.session_state:
     st.session_state.game = None
-    st.session_state.p1_loaf = None
-    st.session_state.p2_loaf = None
     st.session_state.game_started = False
     st.session_state.turn_active = False
     st.session_state.attack_sequence = []
