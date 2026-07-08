@@ -133,7 +133,7 @@ class BreadBrawl:
                     self.states[user].power_up_turns = 5
 
             case Attack.SANDWICH_TRAP:
-                if self.states[user.opponent()].trap_turns == 0:
+                if self.states[user.opponent()].trap_turns == 0 and opp_block:
                     self.states[user.opponent()].trap_turns = 4
 
         self.states[user.opponent()].hp = max(0, self.states[user.opponent()].hp - damage * opp_block)
