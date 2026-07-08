@@ -205,8 +205,6 @@ def main():
                     if st.button("🔄 New Battle", key="restart_btn", use_container_width=True):
                         st.session_state.game_started = False
                         st.session_state.game = None
-                        st.session_state.p1_loaf = None
-                        st.session_state.p2_loaf = None
                         st.rerun()
                 else:
                     st.session_state.turn_active = False
