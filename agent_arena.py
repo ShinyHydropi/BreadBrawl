@@ -219,8 +219,8 @@ def main():
                 # Execute turn
                 time.sleep(2)
                 st.session_state.obs, move_sequence, _, _ = game.step_2p(
-                    st.session_state.model1(st.session_state.obs),
-                    st.session_state.model2(st.session_state.obs)
+                    st.session_state.model1(st.session_state.obs(Player.P1)),
+                    st.session_state.model2(st.session_state.obs(Player.P2)),
                 )
 
                 # move_sequence is a list of (Player, Attack) tuples in resolution order

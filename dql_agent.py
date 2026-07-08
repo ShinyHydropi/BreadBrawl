@@ -6,7 +6,7 @@ import numpy as np
 from collections import deque
 import random
 
-from breadbrawl import BreadBrawl, Loaf, Attack
+from breadbrawl import BreadBrawl, Loaf, Attack, Player
 from tqdm import tqdm
 
 GAMMA = 0.99
@@ -97,17 +97,18 @@ if __name__ == "__main__":
     to fill the replay buffer with many episodes to sample from. Otherwise, we would be sampling the same early
     episodes many times.
     """
-    obs = env.reset()
+    obs = env.reset()(Player.P1)
     for _ in range(MIN_REPLAY_SIZE):
         action = your_loaf.random_attack()
-        next_obs, _, done, reward = env.step_1p(action)
+        obs_func, _, done, reward = env.step_1p(action)
+        next_obs = obs_func(Player.P1)
         action = your_loaf.action_space.index(action)
         transition = (obs, action, done, reward, next_obs)
         replay_buffer.append(transition)
         obs = next_obs
 
         if done:
-            obs = env.reset()
+            obs = env.reset()(Player.P1)
 
     """
     Below is where the actual training happens. Here are some important functions:
@@ -117,7 +118,7 @@ if __name__ == "__main__":
     your_loaf.action_space - Returns a list of all the attacks your_loaf can use
     """
     episode_reward = 0.0
-    obs = env.reset()
+    obs = env.reset()(Player.P1)
     for step in tqdm(range(STEPS)):
         """
         At the beginning of each step (in this environment one step is one turn of the battle), the agent selects
@@ -137,7 +138,8 @@ if __name__ == "__main__":
         Steps will continue to be added to the replay buffer. Once the buffer exceeds 50,000 steps the oldest ones
         are discarded.
         """
-        next_obs, _, done, reward = env.step_1p(action)
+        obs_func, _, done, reward = env.step_1p(action)
+        next_obs = obs_func(Player.P1)
         transition = (obs, your_loaf.action_space.index(action), done, reward, next_obs)
         replay_buffer.append(transition)
         obs = next_obs
@@ -145,7 +147,7 @@ if __name__ == "__main__":
         episode_reward += reward
 
         if done:
-            obs = env.reset()
+            obs = env.reset()(Player.P1)
 
             """
             Here we are tracking how well the agent performed. Agent's HP - Opponent's HP is used as the reward

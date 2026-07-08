@@ -139,11 +139,15 @@ class BreadBrawl:
         self.states[user.opponent()].hp = max(0, self.states[user.opponent()].hp - damage * opp_block)
         self.states[user].hp = min(self.players[user].flour, self.states[user].hp + heal)
 
+    # Method for retrieving the observation of a given player
+    def get_player_observation(self, player: Player):
+        return self.states[player].to_tuple() + self.states[player.opponent()].to_tuple()
+
     # Method for resetting the environment
     def reset(self):
         self.states = {Player.P1: PlayerState(self.players[Player.P1].flour, 0, 0, 0, 0), Player.P2: PlayerState(self.players[Player.P2].flour, 0, 0, 0, 0)}
         self.result = 0
-        return self.states[Player.P1].to_tuple() + self.states[Player.P2].to_tuple()
+        return self.get_player_observation
 
     # Method for stepping a training environment
     def step_1p(self, p1att: Attack):
@@ -162,6 +166,7 @@ class BreadBrawl:
         if not (p1att in self.players[Player.P1].attacks):
             raise ValueError(f"{p1att} not in {self.players[Player.P1].attacks}")
 
+        # Determines attacking order
         tiebreak = random.randint(0,1)
         for player, attack in actions:
             priority = -self.players[player].sugar
@@ -202,5 +207,5 @@ class BreadBrawl:
                 self.states[p].sprint_turns = max(0, self.states[p].sprint_turns - 1)
                 self.states[p].power_up_turns = max(0, self.states[p].power_up_turns - 1)
 
-        # Returns the current state, the result of the match if it has terminated, and the net change in hp after the turn
-        return self.states[Player.P1].to_tuple() + self.states[Player.P2].to_tuple(), output_sequence, self.result, self.states[Player.P1].hp - i_hp_1 + i_hp_2 - self.states[Player.P2].hp
+        # Returns the observation function, the result of the match if it has terminated, and the net change in hp after the turn
+        return self.get_player_observation, output_sequence, self.result, self.states[Player.P1].hp - i_hp_1 + i_hp_2 - self.states[Player.P2].hp
