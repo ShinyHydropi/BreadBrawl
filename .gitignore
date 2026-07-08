@@ -179,3 +179,6 @@ pyrightconfig.json
 # own additions
 .pre-commit-config.yaml
 .idea
+*.pt
+*.pkl
+*.json
