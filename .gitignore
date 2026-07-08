@@ -178,3 +178,4 @@ pyrightconfig.json
 
 # own additions
 .pre-commit-config.yaml
+.gitignore
