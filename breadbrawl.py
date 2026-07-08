@@ -5,8 +5,8 @@ import random
 # Attack descriptions:
 # Crust Crusher - Deals damage equal to the user's salt plus a small damage roll
 # Oven Spring - Acts first; fails if used last turn; protects the user from all damage this turn
-# Leech Loaf - Deals damage equal to 0.6x the user's salt plus a small damage roll and heals the damage dealt
-# Second Rise - Restores half the user's max flour
+# Leech Loaf - Deals damage equal to 70% of the user's salt plus a small damage roll; heals half the damage dealt
+# Second Rise - Restores 30% of the user's max flour
 # Instant Yeast - Boosts user's sugar by 50% for three turns; fails if the boost is already active
 # Gluten Surge - Boosts user's salt by 50% for three turns; fails if the boost is already active
 class Attack(Enum):
@@ -39,7 +39,7 @@ class PlayerState:
 
 # Loaf class for creating bread loaves to battle with
 # flour is your hp, salt is your attack, and sugar is your speed
-# Your base stat spread is 25/10/10, and you can distribute 6 extra points among them
+# Your base stat spread is 35/10/10, and you can distribute 6 extra points among them
 # For your move set, select 4 moves from the attacks enum
 class Loaf:
     def __init__(self, flour: int, salt: int, sugar: int, attacks: list[Attack]):
@@ -47,7 +47,7 @@ class Loaf:
             raise ValueError("Extra points added to your stat spread must be between 0 and 6")
         if len(attacks) > 4 or len(attacks) == 0:
             raise ValueError("Your Loaf must have 1-4 attacks")
-        self.flour = 25 + flour
+        self.flour = 35 + flour
         self.salt = 10 + salt
         self.sugar = 10 + sugar
         self.action_space = attacks
@@ -68,7 +68,7 @@ class Loaf:
         return random.sample(self.action_space, 1)[0]
 
     def __copy__(self):
-        return Loaf(self.flour - 25, self.salt - 10, self.sugar - 10, self.action_space)
+        return Loaf(self.flour - 35, self.salt - 10, self.sugar - 10, self.action_space)
 
     def __str__(self):
         return f"Loaf(Flour: {self.flour}, Salt: {self.salt}, Sugar: {self.sugar}, Attacks: {self.attacks})"
@@ -101,7 +101,7 @@ class BreadBrawl:
         opp_block = 0 if self.states[user.opponent()].blocked == 2 else 1
         salt = self.players[user].salt
         if self.states[user].power_up_turns > 0:
-            salt *= 2
+            salt = int(1.5 * salt)
 
         match attack:
             case Attack.OVEN_SPRING:
@@ -111,17 +111,19 @@ class BreadBrawl:
                 damage = random.randrange(-2, 2) + salt
 
             case Attack.LEECH_LOAF:
-                damage = random.randrange(-2, 2) + int(0.6 * salt)
-                heal = damage * opp_block
+                damage = random.randrange(-2, 2) + int(0.7 * salt)
+                heal = (damage * opp_block) // 2
 
             case Attack.SECOND_RISE:
-                heal = self.players[user].flour // 2
+                heal = int(self.players[user].flour * 0.3)
 
             case Attack.INSTANT_YEAST:
-                self.states[user].sprint_turns = 4
+                if self.states[user].sprint_turns == 0:
+                    self.states[user].sprint_turns = 4
 
             case Attack.GLUTEN_SURGE:
-                self.states[user].power_up_turns = 4
+                if self.states[user].power_up_turns == 0:
+                    self.states[user].power_up_turns = 4
 
         self.states[user.opponent()].hp = max(0, self.states[user.opponent()].hp - damage * opp_block)
         self.states[user].hp = min(self.players[user].flour, self.states[user].hp + heal)
@@ -153,7 +155,7 @@ class BreadBrawl:
         for player, attack in actions:
             priority = -self.players[player].sugar
             if self.states[player].sprint_turns > 0:
-                priority *= 2
+                priority = int(1.5 * priority)
             if attack == Attack.OVEN_SPRING:
                 priority -= 100
             order.append((priority, tiebreak, player, attack))
