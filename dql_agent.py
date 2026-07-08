@@ -64,7 +64,7 @@ if __name__ == "__main__":
     # your_loaf = Loaf()
 
     # Example:
-    # your_loaf = Loaf(flour=2, salt=3, sugar=1, attacks=[Attack.CRUST_CRUSHER, Attack.OVEN_SPRING, Attack.GLUTEN_SURGE, Attack.INSTANT_YEAST])
+    # your_loaf = Loaf(flour=2, salt=3, sugar=1, attacks=[Attack.CRUST_CRUSHER, Attack.OVEN_SPRING, Attack.GLUTEN_SURGE])
 
     """
     Some more objects we will need:
