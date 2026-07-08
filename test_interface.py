@@ -40,7 +40,7 @@ def get_attack_emoji(attack: Attack) -> str:
         Attack.SECOND_RISE: "💚",
         Attack.INSTANT_YEAST: "👟",
         Attack.GLUTEN_SURGE: "💪",
-        Attack.SANDWICH_TRAP: "🕸️",
+        Attack.SANDWICH_TRAP: "🕸️"
     }
     return emoji_map.get(attack, "")
 
@@ -53,7 +53,7 @@ def get_attack_description(attack: Attack) -> str:
         Attack.SECOND_RISE: "Second Rise",
         Attack.INSTANT_YEAST: "Instant Yeast",
         Attack.GLUTEN_SURGE: "Gluten Surge",
-        Attack.SANDWICH_TRAP: "Sandwich Trap",
+        Attack.SANDWICH_TRAP: "Sandwich Trap"
     }
     return descriptions.get(attack, attack.name)
 
