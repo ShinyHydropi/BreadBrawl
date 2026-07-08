@@ -83,8 +83,8 @@ if __name__ == "__main__":
     estimate of the Q-function, and one to keep fixed for many episodes at a time. This fixed network is used
     during policy evaluation as a stationary target for approximating the value of the next state.
     """
-    online_net = DQNetwork(your_loaf, 8, len(your_loaf.action_space))
-    target_net = DQNetwork(your_loaf, 8, len(your_loaf.action_space))
+    online_net = DQNetwork(your_loaf, 10, len(your_loaf.action_space))
+    target_net = DQNetwork(your_loaf, 10, len(your_loaf.action_space))
     target_net.load_state_dict(online_net.state_dict())
 
     """

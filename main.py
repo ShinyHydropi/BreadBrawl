@@ -7,7 +7,7 @@ import pickle
 # your_loaf = Loaf.random_loaf()
 your_loaf = pickle.load(open("loaf.pkl", "rb"))
 
-model = DQNetwork(your_loaf, 8, len(your_loaf.action_space))
+model = DQNetwork(your_loaf, 10, len(your_loaf.action_space))
 model.load_state_dict(torch.load("model.pt"))
 model.eval()
 
