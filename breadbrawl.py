@@ -190,7 +190,7 @@ class BreadBrawl:
         if self.result == 0:
             for p in list(Player):
                 if self.states[p].trap_turns:
-                    damage = self.players[p.opponent()].salt
+                    damage = int(self.players[p.opponent()].salt * 0.4)
                     if self.states[p.opponent()].power_up_turns:
                         damage *= 2
                     self.states[p].hp = max(0, self.states[p].hp - damage)
