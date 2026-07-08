@@ -40,6 +40,7 @@ def get_attack_emoji(attack: Attack) -> str:
         Attack.SECOND_RISE: "💚",
         Attack.INSTANT_YEAST: "👟",
         Attack.GLUTEN_SURGE: "💪",
+        Attack.SANDWICH_TRAP: "🕸️",
     }
     return emoji_map.get(attack, "")
 
@@ -52,6 +53,7 @@ def get_attack_description(attack: Attack) -> str:
         Attack.SECOND_RISE: "Second Rise",
         Attack.INSTANT_YEAST: "Instant Yeast",
         Attack.GLUTEN_SURGE: "Gluten Surge",
+        Attack.SANDWICH_TRAP: "Sandwich Trap",
     }
     return descriptions.get(attack, attack.name)
 
@@ -89,11 +91,15 @@ def display_loaf(player: Player, loaf: Loaf, state, col):
         # Active effects
         effects = []
         if state.sprint_turns > 0:
-            effects.append(f"💨 Sprint ({state.sprint_turns})")
+            effects.append(f"👟 Sugar Boosted ({state.sprint_turns})")
         if state.power_up_turns > 0:
-            effects.append(f"⭐ Power-Up ({state.power_up_turns})")
-        if state.blocked > 0:
+            effects.append(f"💪 Salt Boosted ({state.power_up_turns})")
+        if state.blocked == 2:
+            effects.append("🛡️ Blocking")
+        if state.blocked == 1:
             effects.append("🛡️ Blocked")
+        if state.trap_turns > 0:
+            effects.append(f"🕸️ Trapped ({state.trap_turns})")
         
         if effects:
             st.info(" | ".join(effects))
@@ -154,8 +160,12 @@ def main():
                 # Show all attacks with 2-second display and wait for disappearance
                 for player, attack in st.session_state.attack_sequence:
                     player_num = player.value + 1
-                    emoji = get_attack_emoji(attack)
-                    desc = get_attack_description(attack)
+                    if attack:
+                        emoji = get_attack_emoji(attack)
+                        desc = get_attack_description(attack)
+                    else:
+                        emoji = "🥪"
+                        desc = f"P{player_num} was hurt by the sandwich"
                     
                     if player_num == 1:
                         with animation_placeholder.container():
@@ -163,18 +173,13 @@ def main():
                     else:
                         with animation_placeholder.container():
                             st.warning(f"🔴 Player {player_num}: {emoji} {desc}")
+
+                    st.session_state.move_log.append(f"P{player_num}: {emoji} {desc}")
+                    display_move_log(log_col, log_holder)
                     
                     time.sleep(2)
                     animation_placeholder.empty()
                     time.sleep(0.3)
-                
-                # Add moves to log
-                for player, attack in st.session_state.attack_sequence:
-                    player_num = player.value + 1
-                    emoji = get_attack_emoji(attack)
-                    desc = get_attack_description(attack)
-                    st.session_state.move_log.append(f"P{player_num}: {emoji} {desc}")
-                    display_move_log(log_col, log_holder)
                 
                 if game.result:
                     # Battle ended - show win screen
