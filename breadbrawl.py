@@ -1,5 +1,5 @@
 from enum import Enum
-from dataclasses import dataclass
+from dataclasses import dataclass, astuple
 import random
 
 # Attack descriptions:
@@ -31,14 +31,10 @@ class Player(Enum):
 @dataclass
 class PlayerState:
     hp: int
-    blocked: int
-    sprint_turns: int
-    power_up_turns: int
-    trap_turns: int
-
-    # Method to convert to tuples for observation from an agent
-    def to_tuple(self):
-        return self.hp, self.blocked, self.sprint_turns, self.power_up_turns, self.trap_turns
+    blocked: int = 0
+    sprint_turns: int = 0
+    power_up_turns: int = 0
+    trap_turns: int = 0
 
 # Loaf class for creating bread loaves to battle with
 # flour is your hp, salt is your attack, and sugar is your speed
@@ -71,6 +67,7 @@ class Loaf:
         attacks.append(d_move)
         return cls(flour, salt, sugar, attacks)
 
+    # Method to select a random attack
     def random_attack(self):
         return random.sample(self.action_space, 1)[0]
 
@@ -140,14 +137,17 @@ class BreadBrawl:
         self.states[user].hp = min(self.players[user].flour, self.states[user].hp + heal)
 
     # Method for retrieving the observation of a given player
-    def get_player_observation(self, player: Player):
-        return self.states[player].to_tuple() + self.states[player.opponent()].to_tuple()
+    def _get_player_observation(self, player: Player):
+        return astuple(self.states[player]) + astuple(self.states[player.opponent()])
 
     # Method for resetting the environment
     def reset(self):
-        self.states = {Player.P1: PlayerState(self.players[Player.P1].flour, 0, 0, 0, 0), Player.P2: PlayerState(self.players[Player.P2].flour, 0, 0, 0, 0)}
+        self.states = {
+            Player.P1: PlayerState(self.players[Player.P1].flour),
+            Player.P2: PlayerState(self.players[Player.P2].flour)
+        }
         self.result = 0
-        return self.get_player_observation
+        return self._get_player_observation
 
     # Method for stepping a training environment
     def step_1p(self, p1att: Attack):
@@ -208,4 +208,4 @@ class BreadBrawl:
                 self.states[p].power_up_turns = max(0, self.states[p].power_up_turns - 1)
 
         # Returns the observation function, the result of the match if it has terminated, and the net change in hp after the turn
-        return self.get_player_observation, output_sequence, self.result, self.states[Player.P1].hp - i_hp_1 + i_hp_2 - self.states[Player.P2].hp
+        return self._get_player_observation, output_sequence, self.result, self.states[Player.P1].hp - i_hp_1 + i_hp_2 - self.states[Player.P2].hp
