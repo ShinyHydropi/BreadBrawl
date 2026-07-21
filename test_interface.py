@@ -3,6 +3,7 @@
 import streamlit as st
 import time
 from breadbrawl import BreadBrawl, Loaf, Attack, Player
+from agent_arena import display_loaf, display_move_log, get_attack_emoji, get_attack_description
 
 # Page configuration
 st.set_page_config(page_title="BreadBrawl", layout="wide")
@@ -31,90 +32,6 @@ def init_game():
     st.session_state.attack_index = 0
     st.session_state.move_log = []
 
-def get_attack_emoji(attack: Attack) -> str:
-    """Get emoji representation for attack types."""
-    emoji_map = {
-        Attack.OVEN_SPRING: "🛡️",
-        Attack.CRUST_CRUSHER: "⚔️",
-        Attack.LEECH_LOAF: "🩸",
-        Attack.SECOND_RISE: "💚",
-        Attack.INSTANT_YEAST: "👟",
-        Attack.GLUTEN_SURGE: "💪",
-        Attack.SANDWICH_TRAP: "🕸️"
-    }
-    return emoji_map.get(attack, "")
-
-def get_attack_description(attack: Attack) -> str:
-    """Get description for attack types."""
-    descriptions = {
-        Attack.OVEN_SPRING: "Oven Spring",
-        Attack.CRUST_CRUSHER: "Crust Crusher",
-        Attack.LEECH_LOAF: "Leech Loaf",
-        Attack.SECOND_RISE: "Second Rise",
-        Attack.INSTANT_YEAST: "Instant Yeast",
-        Attack.GLUTEN_SURGE: "Gluten Surge",
-        Attack.SANDWICH_TRAP: "Sandwich Trap"
-    }
-    return descriptions.get(attack, attack.name)
-
-def display_loaf(player: Player, loaf: Loaf, state, col):
-    """Display loaf character with stats."""
-    with col:
-        # st.subheader(f"Player {player.value + 1} - 🍞")
-        if player == Player.P1:
-            st.subheader(f"Your Loaf")
-        else:
-            st.subheader(f"CPU")
-        
-        # Display loaf art (simple text representation)
-        st.markdown("""
-        <div style='text-align: center; font-size: 48px;'>
-        🍞
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Display stats
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.metric("Salt (Attack)", loaf.salt)
-        with col2:
-            st.metric("Sugar (Speed)", loaf.sugar)
-        with col3:
-            st.metric("Flour (Hit Points)", loaf.flour)
-        
-        # Health progress bar
-        current_hp = state.hp
-        max_hp = loaf.flour
-        health_percentage = current_hp / max_hp
-        st.progress(health_percentage, text=f"HP: {current_hp}/{max_hp}")
-        
-        # Active effects
-        effects = []
-        if state.sprint_turns > 0:
-            effects.append(f"👟 Sugar Boosted ({state.sprint_turns})")
-        if state.power_up_turns > 0:
-            effects.append(f"💪 Salt Boosted ({state.power_up_turns})")
-        if state.blocked == 2:
-            effects.append("🛡️ Blocking")
-        if state.blocked == 1:
-            effects.append("🛡️ Blocked")
-        if state.trap_turns > 0:
-            effects.append(f"🕸️ Trapped ({state.trap_turns})")
-        
-        if effects:
-            st.info(" | ".join(effects))
-
-def display_move_log(col, hold):
-    """Display the move log in a sidebar."""
-    with col:
-        hold.empty()
-        if st.session_state.move_log:
-            # Display moves in reverse order (most recent at top)
-            log_text = "\n".join(reversed(st.session_state.move_log))
-            hold.text_area("Battle History", value=log_text, height=600, disabled=True)
-        else:
-            hold.info("No moves yet...")
-
 def main():
     if not st.session_state.game_started:
         # Start screen
@@ -122,7 +39,7 @@ def main():
         ### Welcome to BreadBrawl! 
         A turn-based RPG where two loaves of bread battle for supremacy!
         """)
-        
+
         if st.button("🍞 Start Battle 🍞", key="start_btn", use_container_width=True):
             init_game()
             st.rerun()
@@ -132,31 +49,32 @@ def main():
         with log_col:
             st.subheader("📜 Move Log")
         log_holder = log_col.empty()
-        
+
         game = st.session_state.game
         p1_loaf = st.session_state.p1_loaf
         p2_loaf = st.session_state.p2_loaf
-        
+
         p1_state = game.states[Player.P1]
         p2_state = game.states[Player.P2]
-        
+
         # Display move log on right side
         display_move_log(log_col, log_holder)
-        
+
         with main_content:
             # Create two columns for players
             left_col, right_col = st.columns(2)
-            
+
             display_loaf(Player.P1, p1_loaf, p1_state, left_col)
             display_loaf(Player.P2, p2_loaf, p2_state, right_col)
-            
+
             st.markdown("---")
-            
+
             if st.session_state.turn_active:
                 # Display attack sequence animation
                 st.subheader("⚔️ Battle Animation")
                 animation_placeholder = st.empty()
-                
+                st.session_state.move_log.append(f"Turn {st.session_state.game.turn}")
+
                 # Show all attacks with 2-second display and wait for disappearance
                 for player, attack in st.session_state.attack_sequence:
                     player_num = player.value + 1
@@ -166,7 +84,7 @@ def main():
                     else:
                         emoji = "🥪"
                         desc = f"P{player_num} was hurt by the sandwich"
-                    
+
                     if player_num == 1:
                         with animation_placeholder.container():
                             st.info(f"🔵 Player {player_num}: {emoji} {desc}")
@@ -176,11 +94,11 @@ def main():
 
                     st.session_state.move_log.append(f"P{player_num}: {emoji} {desc}")
                     display_move_log(log_col, log_holder)
-                    
+
                     time.sleep(2)
                     animation_placeholder.empty()
                     time.sleep(0.3)
-                
+
                 if game.result:
                     # Battle ended - show win screen
                     st.markdown("---")
@@ -188,9 +106,9 @@ def main():
                         st.success("🎉 **Player 1 Wins!** 🎉", icon="✨")
                     else:
                         st.error("🎉 **Player 2 Wins!** 🎉", icon="☠️")
-                    
+
                     st.markdown("---")
-                    
+
                     if st.button("🔄 New Battle", key="restart_btn", use_container_width=True):
                         st.session_state.game_started = False
                         st.session_state.game = None
@@ -204,10 +122,10 @@ def main():
             else:
                 # Player 1 move selection
                 st.subheader("⚔️ Choose Your Move (Player 1)")
-                
+
                 p1_attacks = p1_loaf.action_space
                 attack_buttons = st.columns(len(p1_attacks))
-                
+
                 p1_choice = None
                 for i, (button_col, attack) in enumerate(zip(attack_buttons, p1_attacks)):
                     with button_col:
@@ -215,18 +133,18 @@ def main():
                         desc = get_attack_description(attack)
                         if st.button(f"{emoji}\n{desc}", key=f"attack_{attack.name}", use_container_width=True):
                             p1_choice = attack
-                
+
                 if p1_choice:
                     # Player 2 makes random choice
                     p2_choice = p2_loaf.random_attack()
-                    
+
                     # Execute turn
                     _, move_sequence, _, _ = game.step_2p(p1_choice, p2_choice)
-                    
+
                     # move_sequence is a list of (Player, Attack) tuples in resolution order
                     st.session_state.attack_sequence = move_sequence
                     st.session_state.turn_active = True
-                    
+
                     st.rerun()
 
 if __name__ == "__main__":

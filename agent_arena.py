@@ -42,32 +42,30 @@ def init_game():
     st.session_state.move_log = []
     st.session_state.obs = st.session_state.game.reset()
 
-
+emoji_map = {
+    Attack.OVEN_SPRING: "🛡️",
+    Attack.CRUST_CRUSHER: "⚔️",
+    Attack.LEECH_LOAF: "🩸",
+    Attack.SECOND_RISE: "💚",
+    Attack.INSTANT_YEAST: "👟",
+    Attack.GLUTEN_SURGE: "💪",
+    Attack.SANDWICH_TRAP: "🕸️"
+}
 def get_attack_emoji(attack: Attack) -> str:
     """Get emoji representation for attack types."""
-    emoji_map = {
-        Attack.OVEN_SPRING: "🛡️",
-        Attack.CRUST_CRUSHER: "⚔️",
-        Attack.LEECH_LOAF: "🩸",
-        Attack.SECOND_RISE: "💚",
-        Attack.INSTANT_YEAST: "👟",
-        Attack.GLUTEN_SURGE: "💪",
-        Attack.SANDWICH_TRAP: "🕸️"
-    }
     return emoji_map.get(attack, "")
 
-
+descriptions = {
+    Attack.OVEN_SPRING: "Oven Spring",
+    Attack.CRUST_CRUSHER: "Crust Crusher",
+    Attack.LEECH_LOAF: "Leech Loaf",
+    Attack.SECOND_RISE: "Second Rise",
+    Attack.INSTANT_YEAST: "Instant Yeast",
+    Attack.GLUTEN_SURGE: "Gluten Surge",
+    Attack.SANDWICH_TRAP: "Sandwich Trap"
+}
 def get_attack_description(attack: Attack) -> str:
     """Get description for attack types."""
-    descriptions = {
-        Attack.OVEN_SPRING: "Oven Spring",
-        Attack.CRUST_CRUSHER: "Crust Crusher",
-        Attack.LEECH_LOAF: "Leech Loaf",
-        Attack.SECOND_RISE: "Second Rise",
-        Attack.INSTANT_YEAST: "Instant Yeast",
-        Attack.GLUTEN_SURGE: "Gluten Surge",
-        Attack.SANDWICH_TRAP: "Sandwich Trap"
-    }
     return descriptions.get(attack, attack.name)
 
 
@@ -124,9 +122,9 @@ def display_move_log(col, hold):
     with col:
         hold.empty()
         if st.session_state.move_log:
-            # Display moves in reverse order (most recent at top)
-            log_text = "\n".join(reversed(st.session_state.move_log))
-            hold.text_area("Battle History", value=log_text, height=600, disabled=True)
+            # Display moves in order (first at top)
+            log_text = "\n".join(st.session_state.move_log)
+            hold.text_area(f"Battle History", value=log_text, height=600, disabled=True)
         else:
             hold.info("No moves yet...")
 
@@ -172,6 +170,7 @@ def main():
                 # Display attack sequence animation
                 st.subheader("⚔️ Battle Animation")
                 animation_placeholder = st.empty()
+                st.session_state.move_log.append(f"Turn {st.session_state.game.turn}")
 
                 # Show all attacks with 2-second display and wait for disappearance
                 for player, attack in st.session_state.attack_sequence:
