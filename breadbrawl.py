@@ -84,6 +84,7 @@ class BreadBrawl:
             p2 = Loaf.random_loaf()
         self.players = {Player.P1: p1, Player.P2: p2}
         self.result = 3
+        self.turn = 0
 
     # Constructor for training an agent
     @classmethod
@@ -115,8 +116,8 @@ class BreadBrawl:
                 damage = random.randrange(-2, 2) + salt
 
             case Attack.LEECH_LOAF:
-                damage = random.randrange(-2, 2) + int(0.7 * salt)
-                heal = (damage * opp_block) // 2
+                damage = random.randrange(-2, 2) + int(0.8 * salt)
+                heal = (damage * opp_block) // 4
 
             case Attack.SECOND_RISE:
                 heal = self.players[user].flour // 4
@@ -147,6 +148,7 @@ class BreadBrawl:
             Player.P2: PlayerState(self.players[Player.P2].flour)
         }
         self.result = 0
+        self.turn = 0
         return self._get_player_observation
 
     # Method for stepping a training environment
@@ -193,7 +195,16 @@ class BreadBrawl:
 
         # Decrements the turn counters and handles trap damage for both players
         if self.result == 0:
-            for p in list(Player):
+            order.clear()
+            for player in list(Player): # Recalculates priority for sandwich damage
+                priority = self.players[player].sugar
+                if self.states[player].sprint_turns > 0:
+                    priority *= 2
+                order.append((priority, tiebreak, player))
+                tiebreak = 1 - tiebreak
+            order.sort()
+
+            for _, _, p in order: # Handles sandwich damage and effect counters in reverse priority
                 if self.states[p].trap_turns:
                     damage = int(self.players[p.opponent()].salt * 0.4)
                     if self.states[p.opponent()].power_up_turns:
@@ -207,5 +218,19 @@ class BreadBrawl:
                 self.states[p].sprint_turns = max(0, self.states[p].sprint_turns - 1)
                 self.states[p].power_up_turns = max(0, self.states[p].power_up_turns - 1)
 
+            self.turn += 1
+            if self.result == 0 and self.turn == 50:
+                self.result = 1 + order[1][2].value()
+
+        match self.result:
+            case 0:
+                reward = self.states[Player.P1].hp - i_hp_1 + i_hp_2 - self.states[Player.P2].hp
+            case 1:
+                reward = 50
+            case 2:
+                reward = -50
+            case _:
+                reward = None
+
         # Returns the observation function, the result of the match if it has terminated, and the net change in hp after the turn
-        return self._get_player_observation, output_sequence, self.result, self.states[Player.P1].hp - i_hp_1 + i_hp_2 - self.states[Player.P2].hp
+        return self._get_player_observation, output_sequence, self.result, reward
