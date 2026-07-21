@@ -98,9 +98,6 @@ class BreadBrawl:
 
     # Method for handling the effects of attacks
     def _perform_attack(self, attack: Attack, user: Player):
-        if self.result:
-            return
-
         damage = 0
         heal = 0
         opp_block = 0 if self.states[user.opponent()].blocked == 2 else 1
@@ -157,6 +154,8 @@ class BreadBrawl:
 
     # Method for stepping the environment by performing the attacks selected by each agent
     def step_2p(self, p1att: Attack, p2att: Attack):
+        if self.result != 0:
+            raise ValueError(f"Reset the environment before stepping in it (result: {self.result})")
         i_hp_1 = self.states[Player.P1].hp
         i_hp_2 = self.states[Player.P2].hp
         actions = [(Player.P1, p1att), (Player.P2, p2att)]
@@ -211,16 +210,17 @@ class BreadBrawl:
                         damage *= 2
                     self.states[p].hp = max(0, self.states[p].hp - damage)
                     self.states[p].trap_turns -= 1
-                    if self.states[p].hp == 0:
-                        self.result += 2 - p.value
                     output_sequence.append((p, None))
+                    if self.states[p].hp == 0:
+                        self.result = 2 - p.value
+                        break
                 self.states[p].blocked = max(0, self.states[p].blocked - 1)
                 self.states[p].sprint_turns = max(0, self.states[p].sprint_turns - 1)
                 self.states[p].power_up_turns = max(0, self.states[p].power_up_turns - 1)
 
             self.turn += 1
             if self.result == 0 and self.turn == 50:
-                self.result = 1 + order[1][2].value()
+                self.result = 1 + order[1][2].value
 
         match self.result:
             case 0:
