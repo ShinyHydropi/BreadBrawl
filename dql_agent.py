@@ -9,15 +9,25 @@ import random
 from breadbrawl import BreadBrawl, Loaf, Attack, Player
 from tqdm import tqdm
 
+# GAMMA = 0.99
+# BATCH_SIZE = 32
+# BUFFER_SIZE = 5000
+# MIN_REPLAY_SIZE = 100
+# EPSILON_START = 1.0
+# EPSILON_END = 0.02
+# EPSILON_DECAY = 1000
+# TARGET_UPDATE_FREQUENCY = 100
+# STEPS = 10000
+
 GAMMA = 0.99
 BATCH_SIZE = 32
 BUFFER_SIZE = 5000
 MIN_REPLAY_SIZE = 100
 EPSILON_START = 1.0
 EPSILON_END = 0.02
-EPSILON_DECAY = 1000
-TARGET_UPDATE_FREQUENCY = 100
-STEPS = 10000
+EPSILON_DECAY = 2000
+TARGET_UPDATE_FREQUENCY = 200
+STEPS = 20000
 
 class DQNetwork(nn.Module):
     def __init__(self, loaf, state_dim, n_actions, hidden=128):
@@ -30,6 +40,8 @@ class DQNetwork(nn.Module):
         self.loaf = loaf
         self.net = nn.Sequential(
             nn.Linear(state_dim, hidden),
+            nn.ReLU(),
+            nn.Linear(hidden, hidden),
             nn.ReLU(),
             nn.Linear(hidden, hidden),
             nn.ReLU(),
@@ -73,10 +85,12 @@ if __name__ == "__main__":
         iteration of improving our agent (This also lets us use past training data while discarding the data that
         is too old)
     reward_buffer - This keeps track of how well the agent is doing
+    selections - this keeps track of the attacks the agent selects during training
     """
     env = BreadBrawl.training_env(your_loaf)
     replay_buffer = deque(maxlen=BUFFER_SIZE)
     reward_buffer = deque([0.0], maxlen=100)
+    selections = dict.fromkeys(your_loaf.action_space, 0)
 
     """
     With Deep-Q learning, we will use two networks, one to update every episode that represents our current best
@@ -133,6 +147,8 @@ if __name__ == "__main__":
             action = your_loaf.random_attack()
         else:
             action = online_net.select_action(obs)
+
+        selections[action] += 1
 
         """
         Steps will continue to be added to the replay buffer. Once the buffer exceeds 50,000 steps the oldest ones
@@ -203,6 +219,9 @@ if __name__ == "__main__":
         if step % TARGET_UPDATE_FREQUENCY == 0:
             target_net.load_state_dict(online_net.state_dict())
     print(f"Average reward per episode: {np.mean(reward_buffer)}")
+    for k in selections:
+        selections[k] /= STEPS
+    print(f"Selection Distribution: {selections}")
     torch.save(online_net.state_dict(), "model.pt")
 
     import pickle
