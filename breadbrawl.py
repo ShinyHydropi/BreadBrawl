@@ -184,7 +184,7 @@ class BreadBrawl:
             if not self.result:
                 # Performs the attack if the battle has not ended
                 self._perform_attack(attack, player)
-                output_sequence.append((player, attack))
+                output_sequence.append((player, attack, self.states[Player.P1].hp, self.states[Player.P2].hp))
 
                 # Checks if either player was knocked out
                 if self.states[Player.P1].hp == 0:
@@ -210,7 +210,7 @@ class BreadBrawl:
                         damage *= 2
                     self.states[p].hp = max(0, self.states[p].hp - damage)
                     self.states[p].trap_turns -= 1
-                    output_sequence.append((p, None))
+                    output_sequence.append((p, None, self.states[Player.P1].hp, self.states[Player.P2].hp))
                     if self.states[p].hp == 0:
                         self.result = 2 - p.value
                         break
