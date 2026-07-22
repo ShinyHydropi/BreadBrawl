@@ -1,12 +1,19 @@
 import re
 import sys
-import importlib
+import importlib.util
 import copy
 import streamlit as st
 import time
 from breadbrawl import BreadBrawl, Loaf, Attack, Player
 
-
+def path_to_module(path: str, name: str):
+    spec = importlib.util.spec_from_file_location(name, path)
+    if spec is None:
+        raise ImportError(f"Could not find module at {path}")
+    custom_module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = custom_module
+    spec.loader.exec_module(custom_module)
+    return custom_module
 
 
 def init_game():
@@ -48,11 +55,7 @@ def get_attack_description(attack: Attack) -> str:
 def display_loaf(player: Player, loaf: Loaf, state, col):
     """Display loaf character with stats."""
     with col:
-        # st.subheader(f"Player {player.value + 1} - 🍞")
-        if player == Player.P1:
-            st.subheader(f"Your Loaf")
-        else:
-            st.subheader(f"CPU")
+        st.subheader(st.session_state.names[player])
 
         # Display loaf art (simple text representation)
         st.markdown("""
@@ -222,13 +225,19 @@ if __name__ == "__main__":
         st.session_state.attack_index = 0
         st.session_state.move_log = []
         st.session_state.obs = ()
-        p1_module = importlib.import_module(re.split(r'[.\\]', sys.argv[1])[2])
+        st.session_state.names = {}
+
+        p1_module = path_to_module(sys.argv[1], "p1_module")
         st.session_state.model1 = p1_module.agent
         st.session_state.p1_loaf = copy.copy(p1_module.loaf())
+        st.session_state.names[Player.P1] = re.split(r'[./\\]', sys.argv[1])[-2]
+
         st.session_state.p2_loaf = Loaf.random_loaf()
         st.session_state.model2 = lambda x: st.session_state.p2_loaf.random_attack()
+        st.session_state.names[Player.P2] = "CPU"
         if len(sys.argv) > 2:
-            p2_module = importlib.import_module(re.split(r'[.\\]', sys.argv[2])[2])
+            p2_module = path_to_module(sys.argv[2], "p2_module")
             st.session_state.model2 = p2_module.agent
             st.session_state.p2_loaf = copy.copy(p2_module.loaf())
+            st.session_state.names[Player.P2] = re.split(r'[./\\]', sys.argv[2])[-2]
     main()
