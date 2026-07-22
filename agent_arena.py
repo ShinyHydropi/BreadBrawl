@@ -6,31 +6,7 @@ import streamlit as st
 import time
 from breadbrawl import BreadBrawl, Loaf, Attack, Player
 
-if len(sys.argv) > 3 or len(sys.argv) < 2:
-    raise ValueError("Wrong number of arguments")
 
-# Page configuration
-st.set_page_config(page_title="BreadBrawl", layout="wide")
-st.title("🍞 BreadBrawl RPG 🍞")
-
-# Initialize session state
-if "game" not in st.session_state:
-    st.session_state.game = None
-    st.session_state.game_started = False
-    st.session_state.turn_active = False
-    st.session_state.attack_sequence = []
-    st.session_state.attack_index = 0
-    st.session_state.move_log = []
-    st.session_state.obs = ()
-    p1_module = importlib.import_module(re.split(r'[.\\]', sys.argv[1])[2])
-    st.session_state.model1 = p1_module.agent
-    st.session_state.p1_loaf = copy.copy(p1_module.loaf())
-    st.session_state.p2_loaf = Loaf.random_loaf()
-    st.session_state.model2 = lambda x: st.session_state.p2_loaf.random_attack()
-    if len(sys.argv) > 2:
-        p2_module = importlib.import_module(re.split(r'[.\\]', sys.argv[2])[2])
-        st.session_state.model2 = p2_module.agent
-        st.session_state.p2_loaf = copy.copy(p2_module.loaf())
 
 
 def init_game():
@@ -230,4 +206,29 @@ def main():
 
 
 if __name__ == "__main__":
+    if len(sys.argv) > 3 or len(sys.argv) < 2:
+        raise ValueError("Wrong number of arguments")
+
+    # Page configuration
+    st.set_page_config(page_title="BreadBrawl", layout="wide")
+    st.title("🍞 BreadBrawl RPG 🍞")
+
+    # Initialize session state
+    if "game" not in st.session_state:
+        st.session_state.game = None
+        st.session_state.game_started = False
+        st.session_state.turn_active = False
+        st.session_state.attack_sequence = []
+        st.session_state.attack_index = 0
+        st.session_state.move_log = []
+        st.session_state.obs = ()
+        p1_module = importlib.import_module(re.split(r'[.\\]', sys.argv[1])[2])
+        st.session_state.model1 = p1_module.agent
+        st.session_state.p1_loaf = copy.copy(p1_module.loaf())
+        st.session_state.p2_loaf = Loaf.random_loaf()
+        st.session_state.model2 = lambda x: st.session_state.p2_loaf.random_attack()
+        if len(sys.argv) > 2:
+            p2_module = importlib.import_module(re.split(r'[.\\]', sys.argv[2])[2])
+            st.session_state.model2 = p2_module.agent
+            st.session_state.p2_loaf = copy.copy(p2_module.loaf())
     main()
