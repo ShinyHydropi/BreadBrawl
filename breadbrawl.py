@@ -52,7 +52,7 @@ class Loaf:
         self.action_space = attacks
         self.attacks = set(attacks)
 
-    # method to generate a random Loaf
+    # Method to generate a random Loaf
     @classmethod
     def random_loaf(cls):
         # Method for generating a 3-tuple summing to 6 source: https://share.google/aimode/oDOuCVbR3pZ80r6Oc
@@ -67,9 +67,24 @@ class Loaf:
         attacks.append(d_move)
         return cls(flour, salt, sugar, attacks)
 
+    # Method for loading a serialized Loaf
+    @classmethod
+    def deserialize(cls, loaf_data: dict):
+        action_space = [Attack(a) for a in loaf_data["action space"]]
+        return cls(loaf_data["flour"], loaf_data["salt"], loaf_data["sugar"], action_space)
+
     # Method to select a random attack
     def random_attack(self):
         return random.sample(self.action_space, 1)[0]
+
+    # Method to serialize a Loaf for saving
+    def serialize(self):
+        return {
+            "flour": self.flour - 35,
+            "salt": self.salt - 10,
+            "sugar": self.sugar - 10,
+            "action space": [a.value for a in self.action_space]
+        }
 
     def __copy__(self):
         return Loaf(self.flour - 35, self.salt - 10, self.sugar - 10, self.action_space)

@@ -5,19 +5,9 @@ import torch.nn as nn
 import numpy as np
 from collections import deque
 import random
-
+import json
 from breadbrawl import BreadBrawl, Loaf, Attack, Player
 from tqdm import tqdm
-
-# GAMMA = 0.99
-# BATCH_SIZE = 32
-# BUFFER_SIZE = 5000
-# MIN_REPLAY_SIZE = 100
-# EPSILON_START = 1.0
-# EPSILON_END = 0.02
-# EPSILON_DECAY = 1000
-# TARGET_UPDATE_FREQUENCY = 100
-# STEPS = 10000
 
 GAMMA = 0.99
 BATCH_SIZE = 32
@@ -224,7 +214,5 @@ if __name__ == "__main__":
     print(f"Selection Distribution: {selections}")
     torch.save(online_net.state_dict(), "model.pt")
 
-    import pickle
-
-    with open("loaf.pkl", "wb") as f:
-        pickle.dump(your_loaf, f)
+    with open("loaf.json", "w") as f:
+        json.dump(your_loaf.serialize(), f)
