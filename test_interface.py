@@ -3,7 +3,7 @@
 import streamlit as st
 import time
 from dataclasses import replace
-from breadbrawl import BreadBrawl, Loaf, Attack, Player
+from breadbrawl import BreadBrawl, Loaf, Player
 from battle_animation import render_battle_scene
 from agent_arena import display_move_log, get_attack_emoji, get_attack_description, draw_idle_scene
 
