@@ -8,6 +8,11 @@ import random
 import json
 from breadbrawl import BreadBrawl, Loaf, Attack, Player
 from tqdm import tqdm
+from pathlib import Path
+
+# Use the following line to name your Loaf
+name = "Default"
+# Also rename the "Default" folder to the name you chose
 
 GAMMA = 0.99
 BATCH_SIZE = 32
@@ -212,7 +217,7 @@ if __name__ == "__main__":
     for k in selections:
         selections[k] /= STEPS
     print(f"Selection Distribution: {selections}")
-    torch.save(online_net.state_dict(), "model.pt")
+    torch.save(online_net.state_dict(), Path(f"{name}/model.pt"))
 
-    with open("loaf.json", "w") as f:
+    with open(Path(f"{name}/loaf.json"), "w") as f:
         json.dump(your_loaf.serialize(), f)

@@ -131,7 +131,6 @@ def main():
 
                 # Show each action in resolution order as an animated battle step
                 for player, attack, p1_after, p2_after in st.session_state.attack_sequence:
-                    player_num = player.value + 1
                     is_environmental = attack is None
                     if is_environmental:
                         emoji, desc = "🥪", "was hurt by the Sandwich Trap"
@@ -140,9 +139,9 @@ def main():
                         desc = get_attack_description(attack)
 
                     if is_environmental:
-                        caption = f"🥪 P{player_num} is caught in the Sandwich Trap!"
+                        caption = f"🥪 {st.session_state.names[player]} is caught in the Sandwich Trap!"
                     else:
-                        caption = f"P{player_num}: {emoji} {desc}"
+                        caption = f"{st.session_state.names[player]}: {emoji} {desc}"
 
                     with battle_stage.container():
                         render_battle_scene(
@@ -157,12 +156,13 @@ def main():
                             animate=True,
                         )
 
-                    st.session_state.move_log.append(f"P{player_num}: {emoji} {desc}")
+                    st.session_state.move_log.append(f"{st.session_state.names[player]}: {emoji} {desc}")
                     display_move_log(log_col, log_holder)
 
                     state_before = {Player.P1: p1_after, Player.P2: p2_after}
 
                     time.sleep(1.8)
+                st.session_state.move_log.append("")
 
                 if game.result:
                     # Battle ended - hold the final state on screen and show the win banner
@@ -170,9 +170,9 @@ def main():
 
                     st.markdown("---")
                     if game.result == 1:
-                        st.success("🎉 **Player 1 Wins!** 🎉", icon="✨")
+                        st.success(f"🎉 **{st.session_state.names[Player.P1]} Wins!** 🎉")
                     else:
-                        st.error("🎉 **Player 2 Wins!** 🎉", icon="☠️")
+                        st.error(f"🎉 **{st.session_state.names[Player.P1]}** 🎉")
 
                     st.markdown("---")
 
@@ -229,7 +229,7 @@ if __name__ == "__main__":
         p1_module = path_to_module(sys.argv[1], "p1_module")
         st.session_state.model1 = p1_module.agent
         st.session_state.p1_loaf = copy.copy(p1_module.loaf())
-        st.session_state.names[Player.P1] = re.split(r'[./\\]', sys.argv[1])[-2]
+        st.session_state.names[Player.P1] = re.split(r'[./\\]', sys.argv[1])[-3]
 
         st.session_state.p2_loaf = Loaf.random_loaf()
         st.session_state.model2 = lambda x: st.session_state.p2_loaf.random_attack()
@@ -238,5 +238,5 @@ if __name__ == "__main__":
             p2_module = path_to_module(sys.argv[2], "p2_module")
             st.session_state.model2 = p2_module.agent
             st.session_state.p2_loaf = copy.copy(p2_module.loaf())
-            st.session_state.names[Player.P2] = re.split(r'[./\\]', sys.argv[2])[-2]
+            st.session_state.names[Player.P2] = re.split(r'[./\\]', sys.argv[2])[-3]
     main()
