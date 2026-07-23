@@ -233,9 +233,9 @@ class BreadBrawl:
                 self.states[p].sprint_turns = max(0, self.states[p].sprint_turns - 1)
                 self.states[p].power_up_turns = max(0, self.states[p].power_up_turns - 1)
 
-            self.turn += 1
-            if self.result == 0 and self.turn == 50:
-                self.result = 1 + order[1][2].value
+        self.turn += 1
+        if self.result == 0 and self.turn == 50:
+            self.result = 1 + order[1][2].value
 
         match self.result:
             case 0:
