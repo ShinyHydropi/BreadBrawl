@@ -13,6 +13,7 @@ from pathlib import Path
 # Use the following line to name your Loaf
 name = "Default"
 # Also rename the "Default" folder to the name you chose
+# Add this name to main.py as well
 
 GAMMA = 0.99
 BATCH_SIZE = 32
