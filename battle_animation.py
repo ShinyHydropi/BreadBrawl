@@ -109,8 +109,8 @@ def render_battle_scene(
         side = "left" if attacker_is_p1 else "right"
         sandwich_div = f'<div class="sandwich {side}">🥪</div>'
 
-    p1_stat_line = f"⚔️{p1_loaf.salt} &nbsp; 👟{p1_loaf.sugar} &nbsp; 🌾{p1_loaf.flour}"
-    p2_stat_line = f"⚔️{p2_loaf.salt} &nbsp; 👟{p2_loaf.sugar} &nbsp; 🌾{p2_loaf.flour}"
+    p1_stat_line = f"⚔️{p1_loaf.salt} &nbsp; 👟{p1_loaf.sugar} &nbsp; ❤️{p1_loaf.flour}"
+    p2_stat_line = f"⚔️{p2_loaf.salt} &nbsp; 👟{p2_loaf.sugar} &nbsp; ❤️{p2_loaf.flour}"
 
     html = f"""
     <div class="stage">
