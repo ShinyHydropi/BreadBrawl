@@ -1,10 +1,14 @@
+# Animation generated with Claude: https://claude.ai/share/4c6d934e-3398-430d-ad3d-22fb9b8d0d38
+
 import re
 import sys
 import importlib.util
 import copy
+from dataclasses import replace
 import streamlit as st
 import time
 from breadbrawl import BreadBrawl, Loaf, Attack, Player
+from battle_animation import render_battle_scene
 
 def path_to_module(path: str, name: str):
     spec = importlib.util.spec_from_file_location(name, path)
@@ -24,6 +28,10 @@ def init_game():
     st.session_state.attack_index = 0
     st.session_state.move_log = []
     st.session_state.obs = st.session_state.game.reset()
+    st.session_state.turn_start_state = {
+        Player.P1: replace(st.session_state.game.states[Player.P1]),
+        Player.P2: replace(st.session_state.game.states[Player.P2]),
+    }
 
 emoji_map = {
     Attack.OVEN_SPRING: "🛡️",
@@ -52,50 +60,6 @@ def get_attack_description(attack: Attack) -> str:
     return descriptions.get(attack, attack.name)
 
 
-def display_loaf(player: Player, loaf: Loaf, state, col):
-    """Display loaf character with stats."""
-    with col:
-        st.subheader(st.session_state.names[player])
-
-        # Display loaf art (simple text representation)
-        st.markdown("""
-        <div style='text-align: center; font-size: 48px;'>
-        🍞
-        </div>
-        """, unsafe_allow_html=True)
-
-        # Display stats
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.metric("Salt (Attack)", loaf.salt)
-        with col2:
-            st.metric("Sugar (Speed)", loaf.sugar)
-        with col3:
-            st.metric("Flour (Hit Points)", loaf.flour)
-
-        # Health progress bar
-        current_hp = state.hp
-        max_hp = loaf.flour
-        health_percentage = current_hp / max_hp
-        st.progress(health_percentage, text=f"HP: {current_hp}/{max_hp}")
-
-        # Active effects
-        effects = []
-        if state.sprint_turns > 0:
-            effects.append(f"👟 Sugar Boosted ({state.sprint_turns})")
-        if state.power_up_turns > 0:
-            effects.append(f"💪 Salt Boosted ({state.power_up_turns})")
-        if state.blocked == 2:
-            effects.append("🛡️ Blocking")
-        if state.blocked == 1:
-            effects.append("🛡️ Blocked")
-        if state.trap_turns > 0:
-            effects.append(f"🕸️ Trapped ({state.trap_turns})")
-
-        if effects:
-            st.info(" | ".join(effects))
-
-
 def display_move_log(col, hold):
     """Display the move log in a sidebar."""
     with col:
@@ -106,6 +70,23 @@ def display_move_log(col, hold):
             hold.text_area(f"Battle History", value=log_text, height=600, disabled=True)
         else:
             hold.info("No moves yet...")
+
+
+def draw_idle_scene(stage, caption):
+    """Render the battle stage at rest (no attack playing), reflecting live game state."""
+    game = st.session_state.game
+    p1_state = game.states[Player.P1]
+    p2_state = game.states[Player.P2]
+    with stage.container():
+        render_battle_scene(
+            p1_name=st.session_state.names[Player.P1],
+            p2_name=st.session_state.names[Player.P2],
+            p1_loaf=st.session_state.p1_loaf, p2_loaf=st.session_state.p2_loaf,
+            p1_before=p1_state, p2_before=p2_state,
+            p1_after=p1_state, p2_after=p2_state,
+            caption=caption,
+            animate=False,
+        )
 
 
 def main():
@@ -137,46 +118,56 @@ def main():
         display_move_log(log_col, log_holder)
 
         with main_content:
-            # Create two columns for players
-            left_col, right_col = st.columns(2)
-
-            display_loaf(Player.P1, p1_loaf, p1_state, left_col)
-            display_loaf(Player.P2, p2_loaf, p2_state, right_col)
-
-            st.markdown("---")
+            st.subheader("⚔️ Battle Arena")
+            # Single persistent stage: stays on screen for the whole battle, showing
+            # both loaves, HP, and active status effects (blocking/boosts/traps) at
+            # all times, and playing each attack out in place when a turn resolves.
+            battle_stage = st.empty()
 
             if st.session_state.turn_active:
-                # Display attack sequence animation
-                st.subheader("⚔️ Battle Animation")
-                animation_placeholder = st.empty()
                 st.session_state.move_log.append(f"Turn {st.session_state.game.turn}")
 
-                # Show all attacks with 2-second display and wait for disappearance
-                for player, attack in st.session_state.attack_sequence:
+                state_before = st.session_state.turn_start_state
+
+                # Show each action in resolution order as an animated battle step
+                for player, attack, p1_after, p2_after in st.session_state.attack_sequence:
                     player_num = player.value + 1
-                    if attack:
+                    is_environmental = attack is None
+                    if is_environmental:
+                        emoji, desc = "🥪", "was hurt by the Sandwich Trap"
+                    else:
                         emoji = get_attack_emoji(attack)
                         desc = get_attack_description(attack)
-                    else:
-                        emoji = "🥪"
-                        desc = f"P{player_num} was hurt by the sandwich"
 
-                    if player_num == 1:
-                        with animation_placeholder.container():
-                            st.info(f"🔵 Player {player_num}: {emoji} {desc}")
+                    if is_environmental:
+                        caption = f"🥪 P{player_num} is caught in the Sandwich Trap!"
                     else:
-                        with animation_placeholder.container():
-                            st.warning(f"🔴 Player {player_num}: {emoji} {desc}")
+                        caption = f"P{player_num}: {emoji} {desc}"
+
+                    with battle_stage.container():
+                        render_battle_scene(
+                            p1_name=st.session_state.names[Player.P1],
+                            p2_name=st.session_state.names[Player.P2],
+                            p1_loaf=p1_loaf, p2_loaf=p2_loaf,
+                            p1_before=state_before[Player.P1], p2_before=state_before[Player.P2],
+                            p1_after=p1_after, p2_after=p2_after,
+                            caption=caption,
+                            attacker=player,
+                            is_environmental=is_environmental,
+                            animate=True,
+                        )
 
                     st.session_state.move_log.append(f"P{player_num}: {emoji} {desc}")
                     display_move_log(log_col, log_holder)
 
-                    time.sleep(2)
-                    animation_placeholder.empty()
-                    time.sleep(0.3)
+                    state_before = {Player.P1: p1_after, Player.P2: p2_after}
+
+                    time.sleep(1.8)
 
                 if game.result:
-                    # Battle ended - show win screen
+                    # Battle ended - hold the final state on screen and show the win banner
+                    draw_idle_scene(battle_stage, "🏁 Battle over!")
+
                     st.markdown("---")
                     if game.result == 1:
                         st.success("🎉 **Player 1 Wins!** 🎉", icon="✨")
@@ -194,14 +185,21 @@ def main():
                     st.session_state.attack_sequence = []
                     st.rerun()
             else:
-                # Execute turn
+                # Between turns: keep the stage visible while the next move is decided
+                draw_idle_scene(battle_stage, f"Turn {game.turn + 1} — choosing moves...")
+
                 time.sleep(2)
+                st.session_state.turn_start_state = {
+                    Player.P1: replace(p1_state),
+                    Player.P2: replace(p2_state),
+                }
                 st.session_state.obs, move_sequence, _, _ = game.step_2p(
                     st.session_state.model1(st.session_state.obs(Player.P1)),
                     st.session_state.model2(st.session_state.obs(Player.P2)),
                 )
 
-                # move_sequence is a list of (Player, Attack) tuples in resolution order
+                # move_sequence is a list of (Player, Attack, PlayerState, PlayerState) tuples
+                # in resolution order
                 st.session_state.attack_sequence = move_sequence
                 st.session_state.turn_active = True
 
@@ -226,6 +224,7 @@ if __name__ == "__main__":
         st.session_state.move_log = []
         st.session_state.obs = ()
         st.session_state.names = {}
+        st.session_state.turn_start_state = {}
 
         p1_module = path_to_module(sys.argv[1], "p1_module")
         st.session_state.model1 = p1_module.agent
