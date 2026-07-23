@@ -172,7 +172,7 @@ def main():
                     if game.result == 1:
                         st.success(f"🎉 **{st.session_state.names[Player.P1]} Wins!** 🎉")
                     else:
-                        st.error(f"🎉 **{st.session_state.names[Player.P1]}** 🎉")
+                        st.error(f"🎉 **{st.session_state.names[Player.P2]}** 🎉")
 
                     st.markdown("---")
 
