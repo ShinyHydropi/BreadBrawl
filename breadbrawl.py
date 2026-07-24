@@ -42,7 +42,7 @@ class PlayerState:
 # For your move set, select 3 moves from the attacks enum
 class Loaf:
     def __init__(self, flour: int, salt: int, sugar: int, attacks: list[Attack]):
-        if not (0 <= flour + salt + sugar <= 6):
+        if flour + salt + sugar > 6 or flour < 0 or salt < 0 or sugar < 0:
             raise ValueError("Extra points added to your stat spread must be between 0 and 6")
         if len(attacks) > 3 or len(attacks) == 0:
             raise ValueError("Your Loaf must have 1-3 attacks")
