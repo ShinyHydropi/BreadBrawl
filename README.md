@@ -21,25 +21,49 @@ rewards, the agent must change its strategy based on the actions it sampled from
 improving its strategy enough times, an agent can even perform as well as or better than humans!
 
 > **Key Terms**:
-> - Environment - the thing the agent is interacting with that defines what actions can be taken and what effect
+> - **Environment** - the thing the agent is interacting with that defines what actions can be taken and what effect
 >   those actions will have
-> - Action - something the agent can do in the environment
-> - State - any information about the environment (for example, the location of objects if the agent is trying
+> - **Action** - something the agent can do in the environment
+> - **State** - any information about the environment (for example, the location of objects if the agent is trying
 >   to navigate)
-> - Agent - a program that chooses actions to take and can improve is policy as it trains
-> - Policy - the strategy the agent uses to select actions (think of it like a function where the state of the
+> - **Agent** - a program that chooses actions to take and can improve is policy as it trains
+> - **Policy** - the strategy the agent uses to select actions (think of it like a function where the state of the
 >   environment is he input and the output is the action the agent should take)
 
 ### Reinforcement learning with BreadBrawl
 
-For this project, our environment is BreadBrawl. The actions available to the agent are seven attacks. The state
-includes information such as how much HP each player has left and the duration of the effects of some attacks.
+For this project, our environment is BreadBrawl. The actions available to the agent are three attacks chosen for
+your character. The state includes information such as how much HP each player has left and the duration of the
+effects of some attacks. The agent is rewarded for inflicting damage and winning, and it is punished for taking
+damage and losing.
 
 ## Deep Q-Learning
 
+In this project, the reinforcement learning method used is deep Q-learning. The methods used determine how the
+policy selects actions and how it improves itself.
+
 ### Q-Learning
 
+the idea behind Q-learning is to estimate the expected value of taking a given action in a given state for every
+possible state-action pair. These expected values of state-action pairs are called **Q-values**, and the function
+that maps these state-action pairs to their Q-values is called the **Q-function**. Once you have a well estimated
+Q-function, then a good policy naturally emerges. Just pick the action with the highest Q-value in your current
+state.
+
+To get good estimates of the Q-value, the output of the Q-function must represent an average of the sampled 
+rewards as a result of selecting the action in the state the Q-value corresponds to. This means using the reward
+from taking that action but also accounting for future rewards. Q-learning does this by adding the rewards
+received immediately after taking that action with the highest Q-value of the next state (the Q-value of the
+action your policy would select). As your estimate of the Q-function improves, each Q-value depending on the
+Q-value for the next state effectively represents future rewards caused by that action.
+
 ### Deep
+
+The "deep" part of deep Q-learning comes from using a neural network as a Q-function. Consider two options: a
+15,000,000 x 3 table of every possible state-action pair or a mathematical function defined by 35,000 parameters.
+Functions tend to be far more efficient, and neural networks are perfect for the job. Think of neural networks
+as infinitely flexible functions that can accurately represent the Q-function of any environment. Neural networks
+can also be optimized easily by using chain rule.
 
 ## Training your agent
 
