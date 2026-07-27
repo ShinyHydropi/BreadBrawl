@@ -61,7 +61,6 @@ class DQNetwork(nn.Module):
         q_values = self.net(state_t)
         max_q = torch.argmax(q_values)
         action = self.loaf.action_space[max_q.item()]
-
         return action
 
 if __name__ == "__main__":
@@ -69,7 +68,7 @@ if __name__ == "__main__":
     your_loaf = Loaf.random_loaf()
 
     # Uncomment the following line and create your own Loaf with the Loaf constructor in breadbrawl.py
-    # your_loaf = Loaf()
+    # your_loaf = Loaf(flour=, salt=, sugar=, attacks=[Attack., Attack., Attack.])
 
     # Example:
     # your_loaf = Loaf(flour=2, salt=3, sugar=1, attacks=[Attack.CRUST_CRUSHER, Attack.OVEN_SPRING, Attack.GLUTEN_SURGE])
