@@ -67,30 +67,36 @@ can also be optimized easily by using chain rule.
 
 ## Training your agent
 
-Use the following steps to create, train, and submit your loaf
+Use the following steps to create, train, and submit your loaf. Use `python3` instead of `python` if you are using
+Linux or Mac
 
-### Recipe for success
-
-1. Create a name for your loaf and rename the "Default" folder to the name you created
-2. Replace "Default" in both dql_agent.py and main.py with your loaf's name
-3. Delete the `# ` on line 71 of dql_agent.py fill in the extra values you want in each stat and what three
-attacks your loaf will use
-4. Delete line 68 in dql_agent.py
-
-### Time to bake!
+### Setting up
 
 1. Open a terminal
    - Linux: press Ctrl + Alt + T
    - Mac: press Cmd + Spacebar and type "Terminal"
    - Windows: press the Windows key, type "Terminal"
-2. Copy and paste the following command into your terminal, fill in your username, and hit enter  
-> ```git clone https://github.com/YOUR_GITHUB_USERNAME_HERE/BreadBrawl```
-3. Copy, paste, and enter this command as well
-> ```cd BreadBrawl```
-4. To train your agent, enter this command
-> ```python dql_agent.py```
-5. To see your agent in action, add your loaf's name and enter this command
-> ```streamlit run agent_arena.py THE_NAME_YOU_CHOSE_FOR_YOUR_LOAF\main.py```
+2. Use the following commands to get the code for BreadBrawl:
+   1. `git clone https://github.com/ShinyHydropi/BreadBrawl`
+   2. `cd BreadBrawl`
+3. Create a python virtual environment
+   - Linux or Mac: `python3 -m venv .venv`
+   - Windows: `python -m venv .venv`
+4. Activate the virtual environment
+   - Linux or Mac: `source .venv/bin/activate`
+   - Windows: `.\.venv\Scripts\Activate.ps1`
+5. Use the following commands to install the required libraries for this project:
+   1. `python -m pip install --upgrade pip`
+   2. `python -m pip install -r requirements.txt`
+
+### Time to bake!
+
+1. To make a loaf, enter this command and follow the prompts:  
+`bash setup_loaf.sh`
+2. To train your agent, add your loaf's name and enter this command:  
+`python dql_agent_NAME.py`
+3. To see your agent in action, add your loaf's name and enter this command:  
+`streamlit run agent_arena.py NAME\main.py`
 
 ### Entering the brawl
 
