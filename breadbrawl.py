@@ -4,7 +4,7 @@ import random
 
 # Attack descriptions:
 # Crust Crusher - Deals damage equal to the user's salt plus a small damage roll
-# Leech Loaf - Deals damage equal to 70% of the user's salt plus a small damage roll; heals half the damage dealt
+# Leech Loaf - Deals damage equal to 80% of the user's salt plus a small damage roll; heals a quarter of the damage dealt
 # Sandwich Trap - Deals 40% of the user's salt at the end of the next three turns; fails if trap is already active
 # Oven Spring - Acts first; fails if used last turn; protects the user from all damage this turn
 # Second Rise - Restores 25% of the user's max flour
