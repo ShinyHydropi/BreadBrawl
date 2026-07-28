@@ -1,0 +1,9 @@
+# BreadBrawl requirements — tested with Python 3.10+
+# Install with: python -m pip install -r requirements.txt
+# Note: PyTorch has platform-specific wheels (CUDA vs CPU). If you need a specific build, see https://pytorch.org/get-started/locally/ for the correct install command.
+
+numpy>=1.23
+torch>=2.0.0
+streamlit>=1.24
+tqdm>=4.64
+typing-extensions>=4.5
