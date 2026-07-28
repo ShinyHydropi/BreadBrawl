@@ -12,8 +12,6 @@ from pathlib import Path
 
 # Use the following line to name your Loaf
 name = "Default"
-# Also rename the "Default" folder to the name you chose
-# Add this name to main.py as well
 
 GAMMA = 0.99
 BATCH_SIZE = 32
@@ -64,21 +62,14 @@ class DQNetwork(nn.Module):
         return action
 
 if __name__ == "__main__":
-    # Delete the following line
+    # This line creates your Loaf with its stats and attacks
     your_loaf = Loaf.random_loaf()
-
-    # Uncomment the following line and create your own Loaf with the Loaf constructor in breadbrawl.py
-    # your_loaf = Loaf(flour=, salt=, sugar=, attacks=[Attack., Attack., Attack.])
-
-    # Example:
-    # your_loaf = Loaf(flour=2, salt=3, sugar=1, attacks=[Attack.CRUST_CRUSHER, Attack.OVEN_SPRING, Attack.GLUTEN_SURGE])
 
     """
     Some more objects we will need:
     env - The environment our agent is interacting with in order to train (in this case BreadBrawl)
-    replay_buffer - This will store the 50,000 most recent episodes so we can collect many episodes before each
-        iteration of improving our agent (This also lets us use past training data while discarding the data that
-        is too old)
+    replay_buffer - This will store the 5,000 most recent actions so we can collect many before each iteration
+        of improving our agent (This also lets us use past training data while discarding the data that is too old)
     reward_buffer - This keeps track of how well the agent is doing
     selections - this keeps track of the attacks the agent selects during training
     """
@@ -102,7 +93,7 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(online_net.parameters(), lr=5e-4)
 
     """
-    In this section, 1000 steps are played with the agent selecting only random actions. These episodes are used
+    In this section, 100 steps are played with the agent selecting only random actions. These episodes are used
     to fill the replay buffer with many episodes to sample from. Otherwise, we would be sampling the same early
     episodes many times.
     """
@@ -162,7 +153,8 @@ if __name__ == "__main__":
 
             """
             Here we are tracking how well the agent performed. Agent's HP - Opponent's HP is used as the reward
-            signal for this environment. Feel free to try a different reward function using the info from the state.
+            signal for this environment. If you win or lose, the reward is 50 or -50 respectively. Feel free to
+            try a different reward function using the info from the state.
             """
             reward_buffer.append(episode_reward)
             episode_reward = 0.0

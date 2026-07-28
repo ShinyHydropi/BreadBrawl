@@ -4,7 +4,6 @@ import torch
 import json
 from pathlib import Path
 
-# Replace "Default" with the name you chose for your Loaf
 name = "Default"
 
 with open(Path(f"{name}/loaf.json"), "r") as f:
