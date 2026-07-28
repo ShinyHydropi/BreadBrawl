@@ -92,7 +92,7 @@ Linux or Mac
 ### Time to bake!
 
 1. To make a loaf, enter this command and follow the prompts:  
-`bash setup_loaf.sh`
+`python setup_loaf.py`
 2. To train your agent, add your loaf's name and enter this command:  
 `python dql_agent_NAME.py`
 3. To see your agent in action, add your loaf's name and enter this command:  
