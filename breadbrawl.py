@@ -70,7 +70,7 @@ class Loaf:
     # Method for loading a serialized Loaf
     @classmethod
     def deserialize(cls, loaf_data: dict):
-        action_space = [Attack(a) for a in loaf_data["action space"]]
+        action_space = [Attack(a) for a in loaf_data["action_space"]]
         return cls(loaf_data["flour"], loaf_data["salt"], loaf_data["sugar"], action_space)
 
     # Method to select a random attack
@@ -83,7 +83,7 @@ class Loaf:
             "flour": self.flour - 35,
             "salt": self.salt - 10,
             "sugar": self.sugar - 10,
-            "action space": [a.value for a in self.action_space]
+            "action_space": [a.value for a in self.action_space]
         }
 
     def __copy__(self):
