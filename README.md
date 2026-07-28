@@ -80,6 +80,9 @@ attacks your loaf will use
 ### Time to bake!
 
 1. Open a terminal
+   - Linux: press Ctrl + Alt + T
+   - Mac: press Cmd + Spacebar and type "Terminal"
+   - Windows: press the Windows key, type "Terminal"
 2. Copy and paste the following command into your terminal, fill in your username, and hit enter  
 > ```git clone https://github.com/YOUR_GITHUB_USERNAME_HERE/BreadBrawl```
 3. Copy, paste, and enter this command as well
@@ -96,3 +99,7 @@ attacks your loaf will use
 3. Send the zipped file to me
 
 ## References
+
+brthor. (2021, January 18). *Coding deep Q-learning in PyTorch – Reinforcement learning DQN code tutorial series p.1* [Video]. YouTube. https://www.youtube.com/watch?v=NP8pXZdU-5U
+
+Sutton, R. S., & Barto, A. G. (2015). *Reinforcement learning: An introduction* (2nd ed., in progress). https://web.stanford.edu/class/psych209/Readings/SuttonBartoIPRLBook2ndEd.pdf
