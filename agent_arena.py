@@ -9,10 +9,6 @@ import streamlit as st
 import time
 from breadbrawl import BreadBrawl, Loaf, Attack, Player
 from battle_animation import render_battle_scene
-import tempfile
-import os
-import traceback
-
 
 def path_to_module(path: str, name: str):
     spec = importlib.util.spec_from_file_location(name, path)
@@ -46,7 +42,6 @@ emoji_map = {
     Attack.GLUTEN_SURGE: "💪",
     Attack.SANDWICH_TRAP: "🕸️"
 }
-
 def get_attack_emoji(attack: Attack) -> str:
     """Get emoji representation for attack types."""
     return emoji_map.get(attack, "")
@@ -60,7 +55,6 @@ descriptions = {
     Attack.GLUTEN_SURGE: "Gluten Surge",
     Attack.SANDWICH_TRAP: "Sandwich Trap"
 }
-
 def get_attack_description(attack: Attack) -> str:
     """Get description for attack types."""
     return descriptions.get(attack, attack.name)
@@ -199,21 +193,10 @@ def main():
                     Player.P1: replace(p1_state),
                     Player.P2: replace(p2_state),
                 }
-                try:
-                    st.session_state.obs, move_sequence, _, _ = game.step_2p(
-                        st.session_state.model1(st.session_state.obs(Player.P1)),
-                        st.session_state.model2(st.session_state.obs(Player.P2)),
-                    )
-                except Exception:
-                    # If a model fails during runtime, fall back to random policy and show an error
-                    st.error("Error running an agent; falling back to random policy. See details below.")
-                    st.error(traceback.format_exc())
-                    st.session_state.model1 = lambda x: st.session_state.p1_loaf.random_attack()
-                    st.session_state.model2 = lambda x: st.session_state.p2_loaf.random_attack()
-                    st.session_state.obs, move_sequence, _, _ = game.step_2p(
-                        st.session_state.model1(st.session_state.obs(Player.P1)),
-                        st.session_state.model2(st.session_state.obs(Player.P2)),
-                    )
+                st.session_state.obs, move_sequence, _, _ = game.step_2p(
+                    st.session_state.model1(st.session_state.obs(Player.P1)),
+                    st.session_state.model2(st.session_state.obs(Player.P2)),
+                )
 
                 # move_sequence is a list of (Player, Attack, PlayerState, PlayerState) tuples
                 # in resolution order
@@ -224,11 +207,14 @@ def main():
 
 
 if __name__ == "__main__":
+    if len(sys.argv) > 3 or len(sys.argv) < 2:
+        raise ValueError("Wrong number of arguments")
+
     # Page configuration
     st.set_page_config(page_title="BreadBrawl", layout="wide")
     st.title("🍞 BreadBrawl RPG 🍞")
 
-    # Initialize session state (preserve prior keys)
+    # Initialize session state
     if "game" not in st.session_state:
         st.session_state.game = None
         st.session_state.game_started = False
@@ -239,95 +225,18 @@ if __name__ == "__main__":
         st.session_state.obs = ()
         st.session_state.names = {}
         st.session_state.turn_start_state = {}
-        st.session_state.p1_loaf = None
-        st.session_state.p2_loaf = None
-        st.session_state.model1 = None
-        st.session_state.model2 = None
-        st.session_state.p1_source = None
 
-    # --- Loaf loader UI (sidebar) ---
-    st.sidebar.header("Load Loaf Module")
+        p1_module = path_to_module(sys.argv[1], "p1_module")
+        st.session_state.model1 = p1_module.agent
+        st.session_state.p1_loaf = copy.copy(p1_module.loaf())
+        st.session_state.names[Player.P1] = re.split(r'[./\\]', sys.argv[1])[-3]
 
-    # Prefill with CLI arg if provided
-    prefill = ""
-    try:
-        if len(sys.argv) > 1:
-            prefill = sys.argv[1]
-    except Exception:
-        prefill = ""
-
-    uploaded = st.sidebar.file_uploader("Upload a loaf module (.py) or leave blank to enter a local path", type=["py"], help="If your loaf module references files in the same folder (loaf.json, model.pt), prefer entering the local path to the module instead of uploading a single file.")
-    path_input = st.sidebar.text_input("Or enter local module path (e.g. NAME/main.py)", value=prefill)
-    load_btn = st.sidebar.button("Load Loaf")
-
-    # Handle uploaded file immediately
-    if uploaded is not None and st.session_state.model1 is None:
-        try:
-            tempdir = tempfile.mkdtemp(prefix="breadbrawl_")
-            temp_path = os.path.join(tempdir, uploaded.name)
-            with open(temp_path, "wb") as f:
-                f.write(uploaded.getbuffer())
-            p1_module = path_to_module(temp_path, "p1_module")
-
-            # Try to extract loaf and agent
-            try:
-                st.session_state.model1 = p1_module.agent
-                st.session_state.p1_loaf = copy.copy(p1_module.loaf())
-            except Exception:
-                raise ImportError("Loaded module did not provide required `loaf()` or `agent()` callables. See traceback below.")
-
-            # Name preference: module.NAME if set, otherwise derive from file name
-            name = getattr(p1_module, "NAME", None)
-            if name is None:
-                name = os.path.splitext(uploaded.name)[0]
-            st.session_state.names[Player.P1] = name
-            st.session_state.p1_source = temp_path
-            st.success(f"Loaded loaf module: {name}")
-        except Exception:
-            st.error("Failed to load uploaded module. See details below.")
-            st.text_area("Error", value=traceback.format_exc(), height=300)
-
-    # Handle manual path input
-    if load_btn and st.session_state.model1 is None:
-        if not path_input:
-            st.sidebar.error("Please enter a path to a module (e.g. NAME/main.py) or upload a .py module file.")
-        else:
-            try:
-                # Attempt to import module from provided path
-                p1_module = path_to_module(path_input, "p1_module")
-
-                # Try to extract loaf and agent
-                try:
-                    st.session_state.model1 = p1_module.agent
-                    st.session_state.p1_loaf = copy.copy(p1_module.loaf())
-                except Exception:
-                    raise ImportError("Module at path did not provide required `loaf()` or `agent()` callables.")
-
-                # Determine name: prefer NAME attribute, else infer from path
-                name = getattr(p1_module, "NAME", None)
-                if name is None:
-                    # infer name from parent directory or filename
-                    parent = os.path.dirname(path_input)
-                    if parent:
-                        name = os.path.basename(parent)
-                    else:
-                        name = os.path.splitext(os.path.basename(path_input))[0]
-
-                st.session_state.names[Player.P1] = name
-                st.session_state.p1_source = path_input
-                st.success(f"Loaded loaf module from {path_input} as '{name}'")
-            except Exception:
-                st.sidebar.error("Failed to import module from the given path. See details below.")
-                st.sidebar.text_area("Import error", value=traceback.format_exc(), height=300)
-
-    # If a loaf was successfully loaded, finish initializing defaults for player 2 and models
-    if st.session_state.model1 is not None and st.session_state.model2 is None:
-        try:
-            st.session_state.p2_loaf = Loaf.random_loaf()
-            st.session_state.model2 = lambda x: st.session_state.p2_loaf.random_attack()
-            st.session_state.names[Player.P2] = "CPU"
-        except Exception:
-            st.error("Internal error initializing CPU loaf. See details below.")
-            st.text_area("Error", value=traceback.format_exc(), height=200)
-
+        st.session_state.p2_loaf = Loaf.random_loaf()
+        st.session_state.model2 = lambda x: st.session_state.p2_loaf.random_attack()
+        st.session_state.names[Player.P2] = "CPU"
+        if len(sys.argv) > 2:
+            p2_module = path_to_module(sys.argv[2], "p2_module")
+            st.session_state.model2 = p2_module.agent
+            st.session_state.p2_loaf = copy.copy(p2_module.loaf())
+            st.session_state.names[Player.P2] = re.split(r'[./\\]', sys.argv[2])[-3]
     main()
