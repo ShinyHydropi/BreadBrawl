@@ -205,7 +205,7 @@ if __name__ == "__main__":
 
         if step % TARGET_UPDATE_FREQUENCY == 0:
             target_net.load_state_dict(online_net.state_dict())
-    print(f"Average reward per episode: {np.mean(reward_buffer)}")
+    print(f"Average reward per battle: {np.mean(reward_buffer)}")
     for k in selections:
         selections[k] /= STEPS
     print(f"Selection Distribution: {selections}")
