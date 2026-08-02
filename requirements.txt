@@ -4,17 +4,7 @@
 # The -f line points pip to PyTorch's CPU wheel index (recommended by PyTorch docs).
 -f https://download.pytorch.org/whl/cpu/torch_stable.html
 
-# Allow NumPy 2.x (keep >=1.23 so older environments still work)
-numpy>=1.23
-
-# Ensure pybind11 is new enough to build extensions compatible with NumPy 2
-pybind11>=2.12
-
-# Build tooling often required when installing from source
-wheel>=0.38
-setuptools>=65
-
-torch==2.0.1+cpu
+torch==2.2.1+cpu
 streamlit>=1.24
 tqdm>=4.64
 typing-extensions>=4.5
