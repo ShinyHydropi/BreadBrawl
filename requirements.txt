@@ -1,4 +1,3 @@
-pip requirements
 # BreadBrawl requirements — tested with Python 3.10+
 # Use a pinned CPU build of PyTorch to avoid pip attempting a source build on platforms
 # that don't have a compatible prebuilt wheel. Update the torch version as needed.
