@@ -55,8 +55,8 @@ def prompt_stats():
         if any(x < 0 or x > 6 for x in (flour, salt, sugar)):
             print("Each value must be between 0 and 6.")
             continue
-        if flour + salt + sugar != 6:
-            print(f"The three numbers must sum to 6. Currently they sum to {flour + salt + sugar}. Try again.")
+        if not 0 <= flour + salt + sugar <= 6:
+            print(f"The three numbers must sum between 6. Currently they sum to {flour + salt + sugar}. Try again.")
             continue
         return flour, salt, sugar
 
