@@ -8,8 +8,8 @@ import random
 # Sandwich Trap - Deals 40% of the user's salt at the end of the next three turns; fails if trap is already active
 # Oven Spring - Acts first; fails if used last turn; protects the user from all damage this turn
 # Second Rise - Restores 25% of the user's max flour
-# Instant Yeast - Doubles user's sugar for four turns; fails if the boost is already active
-# Gluten Surge - Doubles user's salt for four turns; fails if the boost is already active
+# Instant Yeast - Doubles user's sugar for three turns; fails if the boost is already active
+# Gluten Surge - Doubles user's salt for three turns; fails if the boost is already active
 class Attack(Enum):
     CRUST_CRUSHER = 0
     LEECH_LOAF = 1
@@ -136,11 +136,11 @@ class BreadBrawl:
 
             case Attack.INSTANT_YEAST:
                 if self.states[user].sprint_turns == 0:
-                    self.states[user].sprint_turns = 5
+                    self.states[user].sprint_turns = 4
 
             case Attack.GLUTEN_SURGE:
                 if self.states[user].power_up_turns == 0:
-                    self.states[user].power_up_turns = 5
+                    self.states[user].power_up_turns = 4
 
             case Attack.SANDWICH_TRAP:
                 if self.states[user.opponent()].trap_turns == 0 and opp_block:

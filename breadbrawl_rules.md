@@ -48,11 +48,11 @@ Welcome to BreadBrawl — a cheeky, tactical turn-based loaf brawler. This guide
    - Good for clutch recovery.
 
 6. Instant Yeast
-   - Temporarily doubles your sugar (you act earlier) for the next 4 turns.
+   - Temporarily doubles your sugar (you act earlier) for the next 3 turns.
    - If it's already active, using it again does nothing.
 
 7. Gluten Surge
-   - Temporarily doubles your salt (massively increases damage) for the next 4 turns.
+   - Temporarily doubles your salt (massively increases damage) for the next 3 turns.
    - If it's already active, using it again does nothing.
 
 ---
