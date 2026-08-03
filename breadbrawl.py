@@ -42,14 +42,18 @@ class PlayerState:
 # For your move set, select 3 moves from the attacks enum
 class Loaf:
     def __init__(self, flour: int, salt: int, sugar: int, attacks: list[Attack]):
-        if flour + salt + sugar > 6 or flour < 0 or salt < 0 or sugar < 0:
+        if not (flour + salt + sugar < 7) or flour < 0 or salt < 0 or sugar < 0:
             raise ValueError("Extra points added to your stat spread must be between 0 and 6")
         if len(attacks) > 3 or len(attacks) == 0:
             raise ValueError("Your Loaf must have 1-3 attacks")
+        if any(not isinstance(a, Attack) for a in attacks):
+            raise TypeError("All attacks must be members of the Attack enum")
+        if len(set(attacks)) != len(attacks):
+            raise ValueError("Attacks must be unique")
         self.flour = 35 + flour
         self.salt = 10 + salt
         self.sugar = 10 + sugar
-        self.action_space = attacks
+        self.action_space = list(attacks)
         self.attacks = set(attacks)
 
     # Method to generate a random Loaf
