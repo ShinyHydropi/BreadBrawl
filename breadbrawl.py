@@ -4,12 +4,12 @@ import random
 
 # Attack descriptions:
 # Crust Crusher - Deals damage equal to the user's salt plus a small damage roll
-# Leech Loaf - Deals damage equal to 80% of the user's salt plus a small damage roll; heals a quarter of the damage dealt
+# Leech Loaf - Deals damage equal to 70% of the user's salt plus a small damage roll; heals half of the damage dealt
 # Sandwich Trap - Deals 40% of the user's salt at the end of the next three turns; fails if trap is already active
 # Oven Spring - Acts first; fails if used last turn; protects the user from all damage this turn
 # Second Rise - Restores 25% of the user's max flour
 # Instant Yeast - Doubles user's sugar for three turns; fails if the boost is already active
-# Gluten Surge - Doubles user's salt for three turns; fails if the boost is already active
+# Gluten Surge - 50% boost to the user's salt for three turns; fails if the boost is already active
 class Attack(Enum):
     CRUST_CRUSHER = 0
     LEECH_LOAF = 1
@@ -124,7 +124,7 @@ class BreadBrawl:
         opp_block = 0 if self.states[user.opponent()].blocked == 2 else 1
         salt = self.players[user].salt
         if self.states[user].power_up_turns > 0:
-            salt *= 2
+            salt += salt // 2
 
         match attack:
             case Attack.OVEN_SPRING:
@@ -134,8 +134,8 @@ class BreadBrawl:
                 damage = random.randrange(-2, 2) + salt
 
             case Attack.LEECH_LOAF:
-                damage = random.randrange(-2, 2) + int(0.8 * salt)
-                heal = (damage * opp_block) // 4
+                damage = random.randrange(-2, 2) + int(0.7 * salt)
+                heal = (damage * opp_block) // 2
 
             case Attack.SECOND_RISE:
                 heal = self.players[user].flour // 4
@@ -228,7 +228,7 @@ class BreadBrawl:
                 if self.states[p].trap_turns:
                     damage = int(self.players[p.opponent()].salt * 0.4)
                     if self.states[p.opponent()].power_up_turns:
-                        damage *= 2
+                        damage += damage // 2
                     self.states[p].hp = max(0, self.states[p].hp - damage)
                     self.states[p].trap_turns -= 1
                     output_sequence.append((p, None, replace(self.states[Player.P1]), replace(self.states[Player.P2])))

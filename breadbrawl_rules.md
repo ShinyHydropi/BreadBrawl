@@ -28,8 +28,8 @@ Welcome to BreadBrawl — a cheeky, tactical turn-based loaf brawler. This guide
    - Good as a reliable baseline hit.
 
 2. Leech Loaf
-   - Damage = most of your salt (80% as strong as Crust Crusher) plus a small random tweak.
-   - Heals you for a quarter of the damage you successfully deal.
+   - Damage = most of your salt (70% as strong as Crust Crusher) plus a small random tweak.
+   - Heals you for a half of the damage you successfully deal.
    - If the target is fully protected, Leech Loaf deals no damage and heals nothing.
 
 3. Sandwich Trap
@@ -52,7 +52,7 @@ Welcome to BreadBrawl — a cheeky, tactical turn-based loaf brawler. This guide
    - If it's already active, using it again does nothing.
 
 7. Gluten Surge
-   - Temporarily doubles your salt (massively increases damage) for the next 3 turns.
+   - Temporarily gives a 50% bonus your salt (massively increases damage) for the next 3 turns.
    - If it's already active, using it again does nothing.
 
 ---
@@ -88,7 +88,7 @@ If the fight reaches turn 50 with no knockouts, the match ends automatically and
 ---
 
 ## Tips & tactics
-- Combo idea: use Gluten Surge, then Sandwich Trap — trap ticks will be amplified, making it a great delayed burst.
+- Combo idea: use Gluten Surge and Sandwich Trap — trap ticks will be amplified, making it a great delayed burst.
 - Burst: if you want quick damage, pair high-salt attacks and a high speed stat.
 - Stall: pair Sandwich Trap with a defensive move like Oven Spring or Second Rise and win ... eventually.
 - Setup and strike: use Gluten Surge followed by a series of Crust Crushers to inflict maximal damage.
