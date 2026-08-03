@@ -44,6 +44,8 @@ class Loaf:
     def __init__(self, flour: int, salt: int, sugar: int, attacks: list[Attack]):
         if not (flour + salt + sugar < 7) or flour < 0 or salt < 0 or sugar < 0:
             raise ValueError("Extra points added to your stat spread must be between 0 and 6")
+        if any(not isinstance(x, int) for x in (flour, salt, sugar)):
+            raise TypeError("flour, salt and sugar must be integers")
         if len(attacks) > 3 or len(attacks) == 0:
             raise ValueError("Your Loaf must have 1-3 attacks")
         if any(not isinstance(a, Attack) for a in attacks):
