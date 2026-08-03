@@ -183,3 +183,4 @@ pyrightconfig.json
 *.pkl
 *.json
 test.py
+BetaData/
