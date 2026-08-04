@@ -102,19 +102,23 @@ class BreadBrawl:
     def __init__(self, p1: Loaf, p2: Loaf|None = None):
         self.states = None
         if p2 is None:
-            p2 = Loaf.random_loaf()
+            self.training_list = []
+        else:
+            self.training_list = [(p2, lambda x: p2.random_attack())]
         self.players = {Player.P1: p1, Player.P2: p2}
         self.result = 3
         self.turn = 0
 
     # Constructor for training an agent
     @classmethod
-    def training_env(cls, p1: Loaf):
-        return cls(p1, None)
+    def training_env(cls, p1: Loaf, p2: list[Loaf] = []):
+        env = cls(p1, None)
+        env.training_list = p2
+        return env
 
     # Constructor for battling agents
     @classmethod
-    def duel_env(cls, p1: Loaf, p2: Loaf):
+    def duel_env(cls, p1: Loaf, p2: Loaf|None = None):
         return cls(p1, p2)
 
     # Method for handling the effects of attacks
@@ -161,6 +165,11 @@ class BreadBrawl:
 
     # Method for resetting the environment
     def reset(self):
+        if self.training_list:
+            self.players[Player.P2], self.opp_act_func = random.choice(self.training_list)
+        else:
+            self.players[Player.P2] = Loaf.random_loaf()
+            self.opp_act_func = lambda x: self.players[Player.P2].random_attack()
         self.states = {
             Player.P1: PlayerState(self.players[Player.P1].flour),
             Player.P2: PlayerState(self.players[Player.P2].flour)
@@ -171,7 +180,7 @@ class BreadBrawl:
 
     # Method for stepping a training environment
     def step_1p(self, p1att: Attack):
-        return self.step_2p(p1att, self.players[Player.P2].random_attack())
+        return self.step_2p(p1att, self.opp_act_func(self._get_player_observation(Player.P2)))
 
     # Method for stepping the environment by performing the attacks selected by each agent
     def step_2p(self, p1att: Attack, p2att: Attack):
