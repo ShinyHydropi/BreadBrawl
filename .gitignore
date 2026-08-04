@@ -179,8 +179,7 @@ pyrightconfig.json
 # own additions
 .pre-commit-config.yaml
 .idea
-*.pt
-*.pkl
-*.json
+Default*.pt
+Default*.json
 test.py
 BetaData/
