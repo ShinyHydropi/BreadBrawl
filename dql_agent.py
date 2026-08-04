@@ -7,8 +7,22 @@ from collections import deque
 import random
 import json
 from breadbrawl import BreadBrawl, Loaf, Attack, Player
+from agent_arena import path_to_module
 from tqdm import tqdm
 from pathlib import Path
+import copy
+
+"""
+This list is a list of pretrained loafs so that we can train the agent against agents that act more optimally
+than random agents.
+"""
+loaf_list = []
+for name in [
+    "Farloaf_024", "Farloaf_042", "Farloaf_222", "John_Loaf_024", "John_Loaf_222", "John_Loaf_402",
+    "Oloafia_Rodrigo_222", "Oloafia_Rodrigo_240", "Oloafia_Rodrigo_420"
+]:
+    module = path_to_module(f"PretrainedLoafs/{name}/main.py", name)
+    loaf_list.append((copy.copy(module.loaf()), module.agent))
 
 # Use the following line to name your Loaf
 name = "Default"
@@ -73,7 +87,7 @@ if __name__ == "__main__":
     reward_buffer - This keeps track of how well the agent is doing
     selections - this keeps track of the attacks the agent selects during training
     """
-    env = BreadBrawl.training_env(your_loaf)
+    env = BreadBrawl.training_env(your_loaf, loaf_list)
     replay_buffer = deque(maxlen=BUFFER_SIZE)
     reward_buffer = deque([0.0], maxlen=100)
     selections = dict.fromkeys(your_loaf.action_space, 0)
@@ -113,8 +127,8 @@ if __name__ == "__main__":
     """
     Below is where the actual training happens. Here are some important functions:
     env.reset() - Resets the environment for the next episode
-    env.step_1p(action) - Changes the environment by the action the agent chose (The 1p means only one agent is
-        selecting an action)
+    env.step_1p(action) - Changes the environment by the action the agent chose (The 1p means only one agent's
+        action is needed as a parameter)
     your_loaf.action_space - Returns a list of all the attacks your_loaf can use
     """
     episode_reward = 0.0
