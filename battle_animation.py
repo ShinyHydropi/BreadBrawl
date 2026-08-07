@@ -40,7 +40,7 @@ def _status_badges(state):
     if state.sprint_turns > 0:
         badges.append(("👟", f"Sugar x2 ({state.sprint_turns})"))
     if state.power_up_turns > 0:
-        badges.append(("💪", f"Salt x2 ({state.power_up_turns})"))
+        badges.append(("💪", f"Salt x1.75 ({state.power_up_turns})"))
     if state.trap_turns > 0:
         badges.append(("🕸️", f"Trapped ({state.trap_turns})"))
     return badges
