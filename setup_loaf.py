@@ -138,7 +138,7 @@ _model = None
 try:
     import torch
     from dql_agent import DQNetwork
-    model_path = Path(__file__).resolve().parent / "model.pt"
+    model_path = Path("{loaf_dir.as_posix()}") / "model.pt"
     if model_path.exists():
         _model = DQNetwork(your_loaf, 10, len(your_loaf.action_space))
         _model.load_state_dict(torch.load(model_path))
