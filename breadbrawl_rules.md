@@ -15,9 +15,9 @@ Welcome to BreadBrawl — a cheeky, tactical turn-based loaf brawler. This guide
 > Additionally, you get up to 6 extra points to split among Flour, Salt, and Sugar however you like.
 >
 > Example allocations:
-> - +6 Flour → 41 Flour / 10 Salt / 10 Sugar (a beefy tank).
-> - +4 Salt, +2 Sugar → 35 Flour / 14 Salt / 12 Sugar (heavy hitter with some speed).
-> - +6 Sugar → 35 Flour / 10 Salt / 16 Sugar (fast glass cannon).
+> - +6 Flour → 44 Flour / 10 Salt / 10 Sugar (a beefy tank).
+> - +4 Salt, +2 Sugar → 38 Flour / 14 Salt / 12 Sugar (heavy hitter with some speed).
+> - +6 Sugar → 38 Flour / 10 Salt / 16 Sugar (fast glass cannon).
 
 ---
 
@@ -44,7 +44,7 @@ Welcome to BreadBrawl — a cheeky, tactical turn-based loaf brawler. This guide
    - It can't be reactivated if it was active last turn — trying to spam it back-to-back won’t keep renewing its protection.
 
 5. Second Rise
-   - A self-heal that restores 25% of your maximum HP instantly.
+   - A self-heal that restores 20% of your maximum HP instantly.
    - Good for clutch recovery.
 
 6. Instant Yeast
@@ -52,7 +52,7 @@ Welcome to BreadBrawl — a cheeky, tactical turn-based loaf brawler. This guide
    - If it's already active, using it again does nothing.
 
 7. Gluten Surge
-   - Temporarily gives a 50% bonus your salt (massively increases damage) for the next 3 turns.
+   - Temporarily gives a 75% bonus your salt (massively increases damage) for the next 3 turns.
    - If it's already active, using it again does nothing.
 
 ---

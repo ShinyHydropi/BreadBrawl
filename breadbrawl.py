@@ -38,7 +38,7 @@ class PlayerState:
 
 # Loaf class for creating bread loaves to battle with
 # flour is your hp, salt is your attack, and sugar is your speed
-# Your base stat spread is 35/10/10, and you can distribute 6 extra points among them
+# Your base stat spread is 38/10/10, and you can distribute 6 extra points among them
 # For your move set, select 3 moves from the attacks enum
 class Loaf:
     def __init__(self, flour: int, salt: int, sugar: int, attacks: list[Attack]):
@@ -52,7 +52,7 @@ class Loaf:
             raise TypeError("All attacks must be members of the Attack enum")
         if len(set(attacks)) != len(attacks):
             raise ValueError("Attacks must be unique")
-        self.flour = 35 + flour
+        self.flour = 38 + flour
         self.salt = 10 + salt
         self.sugar = 10 + sugar
         self.action_space = list(attacks)
@@ -86,14 +86,14 @@ class Loaf:
     # Method to serialize a Loaf for saving
     def serialize(self):
         return {
-            "flour": self.flour - 35,
+            "flour": self.flour - 38,
             "salt": self.salt - 10,
             "sugar": self.sugar - 10,
             "action_space": [a.value for a in self.action_space]
         }
 
     def __copy__(self):
-        return Loaf(self.flour - 35, self.salt - 10, self.sugar - 10, self.action_space)
+        return Loaf(self.flour - 38, self.salt - 10, self.sugar - 10, self.action_space)
 
     def __str__(self):
         return f"Loaf(Flour: {self.flour}, Salt: {self.salt}, Sugar: {self.sugar}, Attacks: {self.attacks})"
@@ -105,13 +105,15 @@ class BreadBrawl:
             self.training_list = []
         else:
             self.training_list = [(p2, lambda x: p2.random_attack())]
-        self.players = {Player.P1: p1, Player.P2: p2}
+        self.players = {Player.P1: p1}
         self.result = 3
         self.turn = 0
 
     # Constructor for training an agent
     @classmethod
-    def training_env(cls, p1: Loaf, p2: list[Loaf] = []):
+    def training_env(cls, p1: Loaf, p2=None):
+        if p2 is None:
+            p2 = []
         env = cls(p1, None)
         env.training_list = p2
         return env
@@ -128,7 +130,7 @@ class BreadBrawl:
         opp_block = 0 if self.states[user.opponent()].blocked == 2 else 1
         salt = self.players[user].salt
         if self.states[user].power_up_turns > 0:
-            salt += salt // 2
+            salt += int(salt * 0.75)
 
         match attack:
             case Attack.OVEN_SPRING:
@@ -142,7 +144,7 @@ class BreadBrawl:
                 heal = (damage * opp_block) // 2
 
             case Attack.SECOND_RISE:
-                heal = self.players[user].flour // 4
+                heal = self.players[user].flour // 5
 
             case Attack.INSTANT_YEAST:
                 if self.states[user].sprint_turns == 0:
@@ -237,7 +239,7 @@ class BreadBrawl:
                 if self.states[p].trap_turns:
                     damage = int(self.players[p.opponent()].salt * 0.4)
                     if self.states[p.opponent()].power_up_turns:
-                        damage += damage // 2
+                        damage += int(damage * 0.75)
                     self.states[p].hp = max(0, self.states[p].hp - damage)
                     self.states[p].trap_turns -= 1
                     output_sequence.append((p, None, replace(self.states[Player.P1]), replace(self.states[Player.P2])))
