@@ -17,11 +17,8 @@ This list is a list of pretrained loafs so that we can train the agent against a
 than random agents.
 """
 loaf_list = []
-for name in [
-    "Farloaf_024", "Farloaf_042", "Farloaf_222", "John_Loaf_024", "John_Loaf_222", "John_Loaf_402",
-    "Oloafia_Rodrigo_222", "Oloafia_Rodrigo_240", "Oloafia_Rodrigo_420"
-]:
-    module = path_to_module(f"PretrainedLoafs/{name}/main.py", name)
+for name in Path('PretrainedLoafs').iterdir():
+    module = path_to_module(f"{name}/main.py", str(name))
     loaf_list.append((copy.copy(module.loaf()), module.agent))
 
 # Use the following line to name your Loaf
@@ -108,7 +105,7 @@ if __name__ == "__main__":
 
     """
     In this section, 100 steps are played with the agent selecting only random actions. These episodes are used
-    to fill the replay buffer with many episodes to sample from. Otherwise, we would be sampling the same early
+    to fill the replay buffer with many transitions to sample from. Otherwise, we would be sampling the same early
     episodes many times.
     """
     obs = env.reset()(Player.P1)
