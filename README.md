@@ -98,22 +98,22 @@ You're ready to set everything up.
 1. Open Terminal.
 2. Move into the folder you unzipped:
 ```
-   cd Desktop/BreadBrawl-main
+cd Desktop/BreadBrawl-main
 ```
    *(Tip: type `cd ` — with a trailing space — then drag the folder itself into the Terminal window. It will fill in the path for you.)*  
 3. Create a virtual environment. This is just a private, self-contained space for this project's software so it doesn't interfere with anything else on your computer:
 ```
-   python3 -m venv .venv
+python3 -m venv .venv
 ```
 4. Turn on the virtual environment:
 ```
-   source .venv/bin/activate
+source .venv/bin/activate
 ```
    You'll know it worked when you see `(.venv)` appear at the start of your terminal line.
 5. Install the required software. This can take a few minutes — that's expected:
 ```
-   python3 -m pip install --upgrade pip
-   python3 -m pip install -r requirements.txt
+python3 -m pip install --upgrade pip
+python3 -m pip install -r requirements.txt
 ```
 
 #### Step 5: Time to bake!
@@ -122,16 +122,16 @@ Every time you come back to this later (a new day, after closing your terminal, 
  
 1. **Create your loaf.** This asks you a few questions to set up your character:
 ```
-   python3 setup_loaf.py
+python3 setup_loaf.py
 ```
 2. **Train your agent.** Replace `NAME` with the name you gave your loaf in step 1:
 ```
-   python3 dql_agent_NAME.py
+python3 dql_agent_NAME.py
 ```
    This is where your agent actually learns to fight. It may take a while and print out a lot of numbers while it trains — that's normal, just let it run.
 3. **Watch your agent fight.** Replace `NAME` again:
 ```
-   streamlit run agent_arena.py NAME/main.py
+streamlit run agent_arena.py NAME/main.py
 ```
    This should open a new tab in your web browser showing your agent in action.
 
@@ -170,26 +170,26 @@ Every time you come back to this later (a new day, after closing your terminal, 
 1. Open PowerShell.
 2. Move into the folder you unzipped:
 ```
-   cd Desktop\BreadBrawl-main
+cd Desktop\BreadBrawl-main
 ```
    *(Tip: type `cd ` — with a trailing space — then drag the folder itself into the PowerShell window. It will fill in the path for you.)*  
 3. Create a virtual environment:
 ```
-   python -m venv .venv
+python -m venv .venv
 ```
 4. Turn on the virtual environment:
 ```
-   .\.venv\Scripts\Activate.ps1
+.\.venv\Scripts\Activate.ps1
 ```
    - If you get a red error message mentioning "execution policy," run this once (type `Y` and press Enter when it asks), then try the activate command again:
 ```
-     Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 ```
    You'll know it worked when you see `(.venv)` appear at the start of your line.
 5. Install the required software. This can take a few minutes — that's expected:
 ```
-   python -m pip install --upgrade pip
-   python -m pip install -r requirements.txt
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
 ```
 
 #### Step 5: Time to bake!
@@ -198,16 +198,16 @@ Every time you come back to this later (a new day, after closing your terminal, 
  
 1. **Create your loaf.** This asks you a few questions to set up your character:
 ```
-   python setup_loaf.py
+python setup_loaf.py
 ```
 2. **Train your agent.** Replace `NAME` with the name you gave your loaf in step 1:
 ```
-   python dql_agent_NAME.py
+python dql_agent_NAME.py
 ```
    This is where your agent actually learns to fight. It may take a while and print out a lot of numbers while it trains — that's normal, just let it run.
 3. **Watch your agent fight.** Replace `NAME` again:
 ```
-   streamlit run agent_arena.py NAME/main.py
+streamlit run agent_arena.py NAME/main.py
 ```
    This should open a new tab in your web browser showing your agent in action.
 
