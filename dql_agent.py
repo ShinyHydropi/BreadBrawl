@@ -60,7 +60,7 @@ class DQNetwork(nn.Module):
         """
         return self.net(x)
 
-    def select_action(self, state):
+    def select_action(self, state) -> Attack:
         """
         select_action(state) is a helper function for forward(x) that takes a state and returns the action that
         a greedy policy would select. Essentially, it selects the action with the highest expected returns
@@ -148,7 +148,7 @@ if __name__ == "__main__":
         selections[action] += 1
 
         """
-        Steps will continue to be added to the replay buffer. Once the buffer exceeds 50,000 steps the oldest ones
+        Steps will continue to be added to the replay buffer. Once the buffer exceeds 5,000 steps the oldest ones
         are discarded.
         """
         obs_func, _, done, reward = env.step_1p(action)
