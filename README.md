@@ -60,7 +60,7 @@ Q-value for the next state effectively represents future rewards caused by that 
 ### Deep
 
 The "deep" part of deep Q-learning comes from using a neural network as a Q-function. Consider two options: a
-15,000,000 x 3 table of every possible state-action pair or a mathematical function defined by 35,000 parameters.
+37,000,000 x 3 table of every possible state-action pair or a mathematical function defined by 35,000 parameters.
 Functions tend to be far more efficient, and neural networks are perfect for the job. Think of neural networks
 as infinitely flexible functions that can accurately represent the Q-function of any environment. Neural networks
 can also be optimized easily by using chain rule.
