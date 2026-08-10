@@ -75,7 +75,7 @@ Use the following steps to create, train, and submit your loaf.
 
 1. Press `Cmd + Spacebar`, type "Terminal", press Enter.
 2. In the window that opens, type `python3 --version` and press Enter.
-3. If you see something like `Python 3.11.4`, you're all set — skip to Step 3.
+3. If you see something like `Python 3.13.5`, you're all set — skip to Step 3.
 4. If you see an error instead, go to Step 2.
 
 #### Step 2: Install Python
@@ -121,17 +121,23 @@ You're ready to set everything up.
 Every time you come back to this later (a new day, after closing your terminal, etc.), redo step 4 above first — activate the virtual environment — before running anything below.
  
 1. **Create your loaf.** This asks you a few questions to set up your character:
-   - `python3 setup_loaf.py`  
+```
+   python3 setup_loaf.py
+```
 2. **Train your agent.** Replace `NAME` with the name you gave your loaf in step 1:
-   - `python3 dql_agent_NAME.py`  
+```
+   python3 dql_agent_NAME.py
+```
    This is where your agent actually learns to fight. It may take a while and print out a lot of numbers while it trains — that's normal, just let it run.
 3. **Watch your agent fight.** Replace `NAME` again:
-   - `streamlit run agent_arena.py NAME/main.py`  
+```
+   streamlit run agent_arena.py NAME/main.py
+```
    This should open a new tab in your web browser showing your agent in action.
 
 #### Step 6: Entering the brawl
 
-1. Open your file browser (Finder on Mac, File Explorer on Windows) and find the BreadBrawl folder.
+1. Open your file browser (Finder on Mac) and find the BreadBrawl folder.
 2. Inside it, find the folder named after your loaf.
 3. Right-click that folder and click **Compress** (creates a .zip file).
 4. Send the resulting ZIP file to the activity leader.
@@ -142,7 +148,7 @@ Every time you come back to this later (a new day, after closing your terminal, 
 
 1. Press the Windows key, type "PowerShell", press Enter.
 2. Type `python --version` and press Enter.
-3. If you see something like `Python 3.11.4`, you're all set — skip to Step 3.
+3. If you see something like `Python 3.13.5`, you're all set — skip to Step 3.
 4. If it says Python isn't recognized, or the Microsoft Store opens up, go to Step 2.
 
 #### Step 2: Install Python
@@ -191,17 +197,23 @@ Every time you come back to this later (a new day, after closing your terminal, 
 Every time you come back to this later (a new day, after closing your terminal, etc.), redo step 4 above first — activate the virtual environment — before running anything below.
  
 1. **Create your loaf.** This asks you a few questions to set up your character:
-   - `python setup_loaf.py`  
+```
+   python setup_loaf.py
+```
 2. **Train your agent.** Replace `NAME` with the name you gave your loaf in step 1:
-   - `python dql_agent_NAME.py`  
+```
+   python dql_agent_NAME.py
+```
    This is where your agent actually learns to fight. It may take a while and print out a lot of numbers while it trains — that's normal, just let it run.
 3. **Watch your agent fight.** Replace `NAME` again:
-   - `streamlit run agent_arena.py NAME/main.py`  
+```
+   streamlit run agent_arena.py NAME/main.py
+```
    This should open a new tab in your web browser showing your agent in action.
 
 #### Step 6: Entering the brawl
 
-1. Open your file browser (Finder on Mac, File Explorer on Windows) and find the BreadBrawl folder.
+1. Open your file browser (File Explorer on Windows) and find the BreadBrawl folder.
 2. Inside it, find the folder named after your loaf.
 3. Right-click that folder and click **Send to** → **Compressed (zipped) folder**.
 4. Send the resulting ZIP file to the activity leader.
