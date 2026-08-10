@@ -75,7 +75,7 @@ def render_battle_scene(
     HP change to animate) -- badges are drawn from the "after" state.
     """
 
-    p1_max, p2_max = p1_loaf.flour, p2_loaf.flour
+    p1_max, p2_max = p1_loaf.flour * 3, p2_loaf.flour * 3
     p1_before_pct, p1_after_pct = _pct(p1_before.hp, p1_max), _pct(p1_after.hp, p1_max)
     p2_before_pct, p2_after_pct = _pct(p2_before.hp, p2_max), _pct(p2_after.hp, p2_max)
 

@@ -5,11 +5,11 @@ import random
 # Attack descriptions:
 # Crust Crusher - Deals damage equal to the user's salt plus a small damage roll
 # Leech Loaf - Deals damage equal to 70% of the user's salt plus a small damage roll; heals half of the damage dealt
-# Sandwich Trap - Deals 40% of the user's salt at the end of the next three turns; fails if trap is already active
+# Sandwich Trap - Deals 50% of the user's salt at the end of the next three turns; fails if trap is already active
 # Oven Spring - Acts first; fails if used last turn; protects the user from all damage this turn
-# Second Rise - Restores 25% of the user's max flour
+# Second Rise - Restores 20% of the user's max HP (60% of flour)
 # Instant Yeast - Doubles user's sugar for three turns; fails if the boost is already active
-# Gluten Surge - 50% boost to the user's salt for three turns; fails if the boost is already active
+# Gluten Surge - 75% boost to the user's salt for three turns; fails if the boost is already active
 class Attack(Enum):
     CRUST_CRUSHER = 0
     LEECH_LOAF = 1
@@ -38,7 +38,7 @@ class PlayerState:
 
 # Loaf class for creating bread loaves to battle with
 # flour is your hp, salt is your attack, and sugar is your speed
-# Your base stat spread is 38/10/10, and you can distribute 6 extra points among them
+# Your base stat spread is 10/10/10, and you can distribute 6 extra points among them
 # For your move set, select 3 moves from the attacks enum
 class Loaf:
     def __init__(self, flour: int, salt: int, sugar: int, attacks: list[Attack]):
@@ -52,7 +52,7 @@ class Loaf:
             raise TypeError("All attacks must be members of the Attack enum")
         if len(set(attacks)) != len(attacks):
             raise ValueError("Attacks must be unique")
-        self.flour = 38 + flour
+        self.flour = 10 + flour
         self.salt = 10 + salt
         self.sugar = 10 + sugar
         self.action_space = list(attacks)
@@ -86,14 +86,14 @@ class Loaf:
     # Method to serialize a Loaf for saving
     def serialize(self):
         return {
-            "flour": self.flour - 38,
+            "flour": self.flour - 10,
             "salt": self.salt - 10,
             "sugar": self.sugar - 10,
             "action_space": [a.value for a in self.action_space]
         }
 
     def __copy__(self):
-        return Loaf(self.flour - 38, self.salt - 10, self.sugar - 10, self.action_space)
+        return Loaf(self.flour - 10, self.salt - 10, self.sugar - 10, self.action_space)
 
     def __str__(self):
         return f"Loaf(Flour: {self.flour}, Salt: {self.salt}, Sugar: {self.sugar}, Attacks: {self.attacks})"
@@ -144,7 +144,7 @@ class BreadBrawl:
                 heal = (damage * opp_block) // 2
 
             case Attack.SECOND_RISE:
-                heal = self.players[user].flour // 5
+                heal = self.players[user].flour * 3 // 5
 
             case Attack.INSTANT_YEAST:
                 if self.states[user].sprint_turns == 0:
@@ -159,7 +159,7 @@ class BreadBrawl:
                     self.states[user.opponent()].trap_turns = 3
 
         self.states[user.opponent()].hp = max(0, self.states[user.opponent()].hp - damage * opp_block)
-        self.states[user].hp = min(self.players[user].flour, self.states[user].hp + heal)
+        self.states[user].hp = min(self.players[user].flour * 3, self.states[user].hp + heal)
 
     # Method for retrieving the observation of a given player
     def _get_player_observation(self, player: Player):
@@ -173,8 +173,8 @@ class BreadBrawl:
             self.players[Player.P2] = Loaf.random_loaf()
             self.opp_act_func = lambda x: self.players[Player.P2].random_attack()
         self.states = {
-            Player.P1: PlayerState(self.players[Player.P1].flour),
-            Player.P2: PlayerState(self.players[Player.P2].flour)
+            Player.P1: PlayerState(self.players[Player.P1].flour * 3),
+            Player.P2: PlayerState(self.players[Player.P2].flour * 3)
         }
         self.result = 0
         self.turn = 0
@@ -237,7 +237,7 @@ class BreadBrawl:
 
             for _, _, p in order: # Handles sandwich damage and effect counters in reverse priority
                 if self.states[p].trap_turns:
-                    damage = int(self.players[p.opponent()].salt * 0.4)
+                    damage = int(self.players[p.opponent()].salt * 0.5)
                     if self.states[p.opponent()].power_up_turns:
                         damage += int(damage * 0.75)
                     self.states[p].hp = max(0, self.states[p].hp - damage)

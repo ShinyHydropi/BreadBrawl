@@ -5,19 +5,19 @@ Welcome to BreadBrawl — a cheeky, tactical turn-based loaf brawler. This guide
 ---
 
 ## The Loaf
-- Flour = HP (how much damage your loaf can take).
+- Flour = determines HP (how much damage your loaf can take).
+  - HP = 3 * Flour
 - Salt = Attack power (how hard your moves hit).
 - Sugar = Speed (who goes first).
 - Attacks = a set of attacks your loaf can use (max 3 attacks).
 
-
-> Every loaf starts with the base spread (35 Flour / 10 Salt / 10 Sugar).
+> Every loaf starts with the base spread (10 Flour / 10 Salt / 10 Sugar).
 > Additionally, you get up to 6 extra points to split among Flour, Salt, and Sugar however you like.
 >
 > Example allocations:
-> - +6 Flour → 44 Flour / 10 Salt / 10 Sugar (a beefy tank).
-> - +4 Salt, +2 Sugar → 38 Flour / 14 Salt / 12 Sugar (heavy hitter with some speed).
-> - +6 Sugar → 38 Flour / 10 Salt / 16 Sugar (fast glass cannon).
+> - +6 Flour → 16 Flour / 10 Salt / 10 Sugar (a beefy tank).
+> - +4 Salt, +2 Sugar → 10 Flour / 14 Salt / 12 Sugar (heavy hitter with some speed).
+> - +6 Sugar → 10 Flour / 10 Salt / 16 Sugar (fast glass cannon).
 
 ---
 
@@ -34,7 +34,7 @@ Welcome to BreadBrawl — a cheeky, tactical turn-based loaf brawler. This guide
 
 3. Sandwich Trap
    - Sets a trap on the enemy that hurts them at the end of the next 3 turns.
-   - Each trap tick deals about 40% of the trap-setter's salt.
+   - Each trap tick deals about 50% of the trap-setter's salt.
    - If your salt is boosted, trap ticks do even more damage.
    - You cannot place a trap if the opponent is already trapped or is currently fully protected.
 
