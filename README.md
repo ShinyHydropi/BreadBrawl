@@ -21,12 +21,13 @@ rewards, the agent must change its strategy based on the actions it sampled from
 improving its strategy enough times, an agent can even perform as well as or better than humans!
 
 > **Key Terms**:
+> - **Agent** - a program that chooses actions to take and can improve is policy as it trains
 > - **Environment** - the thing the agent is interacting with that defines what actions can be taken and what effect
 >   those actions will have
-> - **Action** - something the agent can do in the environment
 > - **State** - any information about the environment (for example, the location of objects if the agent is trying
 >   to navigate)
-> - **Agent** - a program that chooses actions to take and can improve is policy as it trains
+> - **Action** - something the agent can do in the environment
+> - **Reward** - information from the environment about how good or bad the previous action was
 > - **Policy** - the strategy the agent uses to select actions (think of it like a function where the state of the
 >   environment is he input and the output is the action the agent should take)
 
