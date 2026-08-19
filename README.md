@@ -110,7 +110,7 @@ python3 -m venv .venv
 ```
 source .venv/bin/activate
 ```
-   You'll know it worked when you see `(.venv)` appear at the start of your terminal line.
+   You'll know it worked when you see `(.venv)` appear at the start of your terminal line.  
 5. Install the required software. This can take a few minutes — that's expected:
 ```
 python3 -m pip install --upgrade pip
@@ -186,7 +186,7 @@ python -m venv .venv
 ```
 Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 ```
-   You'll know it worked when you see `(.venv)` appear at the start of your line.
+   You'll know it worked when you see `(.venv)` appear at the start of your line.  
 5. Install the required software. This can take a few minutes — that's expected:
 ```
 python -m pip install --upgrade pip
