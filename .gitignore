@@ -183,3 +183,4 @@ Default/*.pt
 Default/*.json
 test.py
 BetaData/
+CSB_Connect_*/
