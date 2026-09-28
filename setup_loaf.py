@@ -116,7 +116,7 @@ def write_loaf_json(loaf_dir: Path, flour, salt, sugar, action_space):
     print(f"Created {p}")
 
 def write_main_py(loaf_dir: Path, name: str):
-    # Use Path(__file__).resolve().parent to locate loaf.json relative to module
+    # Use Path(__file__).resolve().parent to locate loaf.json and model.pt relative to module
     content = f"""from breadbrawl import Loaf
 import json
 from pathlib import Path
@@ -133,30 +133,20 @@ def _load_loaf():
 
 your_loaf = _load_loaf()
 
-# Lazy model loading: if model.pt exists and torch is available, a model will be used.
 _model = None
-try:
-    import torch
-    from dql_agent import DQNetwork
-    model_path = current_dir = Path(__file__).parent.resolve() / "model.pt"
-    if model_path.exists():
-        _model = DQNetwork(your_loaf, 10, len(your_loaf.action_space))
-        _model.load_state_dict(torch.load(model_path))
-        _model.eval()
-except Exception:
-    _model = None
+import torch
+from dql_agent import DQNetwork
+model_path = Path(__file__).resolve().parent / "model.pt"
+if model_path.exists():
+    _model = DQNetwork(your_loaf, 10, len(your_loaf.action_space))
+    _model.load_state_dict(torch.load(model_path))
+    _model.eval()
 
 def loaf():
     return your_loaf
 
 def agent(obs):
-    # obs is the observation vector; fallback to random if no model or error
-    if _model is None:
-        return your_loaf.random_attack()
-    try:
-        return _model.select_action(obs)
-    except Exception:
-        return your_loaf.random_attack()
+    return _model.select_action(obs)
 """
     p = loaf_dir / "main.py"
     with p.open("w", encoding="utf-8") as f:
